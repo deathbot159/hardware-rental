@@ -1,0 +1,16 @@
+.loader{
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  font-size: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  z-index: 999;
+  top: 0;
+  transition: 1s all;
+  &.hide{
+      top: -100vh;
+  }
+}

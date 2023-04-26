@@ -1,0 +1,27 @@
+$height: 63px;
+$font-size: 40px;
+$border-color: rgba(153, 157, 184, 0.5);
+
+.content__header{
+    width: 100%;
+    margin-top: 30px;
+    padding-left: 40px;
+    border-bottom: 1px solid $border-color;
+    height: $height;
+    display: flex;
+    align-items: center;
+
+    & > p{
+      font-weight: 700;
+      font-size: $font-size;
+    }
+
+    @media(max-width: 992px){
+      padding-left: 30px;
+      border-bottom: unset;
+
+      & > p{
+        font-size: 30px;
+      }
+    }
+}

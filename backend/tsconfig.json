@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "resolvePackageJsonImports": true,
+    "resolveJsonModule": true,
+    "outDir": "./out",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+//    "paths": {
+//      "@/*": ["./Source/*"]
+//    }
+  }
+}

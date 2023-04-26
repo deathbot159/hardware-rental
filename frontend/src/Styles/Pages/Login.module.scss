@@ -1,0 +1,52 @@
+$border-radius: 2rem;
+$login-button-color: #0051D4;
+$form-elements-padding: 15px 30px 15px 30px;
+
+.login__box{
+  width: fit-content !important;
+
+  & > h1 {
+    font-weight: 700;
+  }
+
+  & > button{
+    background-color: $login-button-color;
+  }
+
+  & > div{
+    & > .info_label{
+      display: none;
+    }
+    & > .invalid_label{
+      position: absolute;
+      display: block;
+      font-weight: normal;
+      color: red;
+    }
+    & > .invalid_input{
+      border-width: 2px;
+      border-color: red;
+    }
+  }
+
+  & > div > label{
+    font-weight: bold;
+  }
+
+  & > div > input, & > button{
+    border-radius: $border-radius;
+    padding: $form-elements-padding
+  }
+
+  & > div, & > button{
+    width: 90vw;
+
+    @media(min-width: 765px){
+      width: 30vw;
+    }
+
+    @media(min-width: 1376px){
+      width: 25vw;
+    }
+  }
+}

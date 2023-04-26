@@ -1,0 +1,53 @@
+{
+  "v1": {
+    "/test": {
+      "fileName": "Test",
+      "methods": [
+        "GET"
+      ],
+      "disabled": true
+    },
+    "/authorize": {
+      "fileName": "Authorize",
+      "methods": [
+        "POST"
+      ],
+      "disabled": false
+    },
+    "/token": {
+      "fileName": "Token",
+      "methods": [
+        "POST"
+      ],
+      "disabled": false
+    },
+    "/user/me": {
+      "fileName": "User",
+      "methods": [
+        "GET"
+      ],
+      "disabled": false
+    },
+    "/user/me/rentdevices": {
+      "fileName": "RentDevices",
+      "methods": [
+        "GET"
+      ],
+      "disabled": false
+    },
+    "/devices": {
+      "fileName": "Devices",
+      "methods": [
+        "GET"
+      ],
+      "disabled": false
+    },
+    "/device": {
+      "fileName": "Device",
+      "methods": [
+        "POST"
+      ],
+      "disabled": false
+    }
+  }
+}

@@ -1,0 +1,45 @@
+@import "../global-variables";
+$sidebar-color: #060A30;
+$topbar-height: 10vh;
+
+.topbar{
+  width: 100vw;
+  height: $topbar-height;
+  background-color: $sidebar-color;
+  padding: 20px;
+  display: none;
+
+  @media(max-width: 992px){
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+.sidebar{
+  position: sticky;
+  left: 0;
+  top: 0;
+
+  height: 100vh;
+  background-color: $sidebar-color;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 30px 15px 30px 15px;
+
+  @media(max-width: 992px){
+    height: fit-content;
+    justify-content: flex-start;
+    display: none;
+    &[visible]{
+      display: flex;
+    }
+  }
+
+  & > .top, & > .footer{
+    width: 100%;
+  }
+}

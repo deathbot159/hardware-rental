@@ -1,0 +1,63 @@
+@import "../global-variables";
+
+.button{
+  border-width: 2px;
+  border-radius: 0.6rem;
+  border-style: solid;
+  transition: 0.5s all;
+  &:hover{
+    filter: brightness(1.2);
+  }
+  &.green{
+    border-color: rgba($green-color, 0.5);
+    background-color: rgba($green-color, 0.3);
+    color: $green-color
+  }
+  &.gray{
+    border-color: rgba($gray-color, 0.5);
+    background-color: rgba($gray-color, 0.3);
+    color: $gray-color
+  }
+  &.blocked{
+    cursor: not-allowed;
+  }
+}
+
+.sidebar_button{
+  padding: 13px;
+  text-align: left;
+  margin-bottom: 15px;
+  width: 100%;
+
+  border: 0;
+  background-color: transparent;
+  color: $light-gray-color;
+  transition: color 1s, background-color 1s;
+  &.active {
+    transition: filter 1s;
+    color: white;
+    &.blue{
+      background-color: $blue-color;
+    }
+    &.red{
+      background-color: $red-color;
+    }
+    &:hover {
+      filter: brightness(1.3);
+    }
+  }
+  &:hover{
+    &.blue{
+      background-color: rgba($blue-color, 0.3);
+      &.active{
+        background-color: $blue-color;
+      }
+    }
+    &.red{
+      background-color: rgba($red-color, 0.3);
+      &.active{
+        background-color: $red-color;
+      }
+    }
+  }
+}
