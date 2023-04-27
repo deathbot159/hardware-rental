@@ -114,6 +114,33 @@ namespace DeviceService {
         })
     }
 
+    export async function removeDevice(deviceId: string): Promise<boolean>{
+        return new Promise<boolean>(async resolve=>{
+            try{
+                let success = false;
+
+                let client = await getConnection();
+                let deviceCollection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
+                let rentDevicesCollection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
+                let exists = await deviceCollection.findOne({id: deviceId});
+                let isRented = !!(await rentDevicesCollection.findOne({deviceId: deviceId}));
+                if(exists && !isRented) {
+                    if(await RedisHelper.removeDevice(deviceId)) {
+                        let deleteResult = await deviceCollection.deleteOne({id: deviceId});
+                        success = true;
+                    }else{
+                        success = false;
+                    }
+                }
+                await client.close();
+                resolve(success);
+            }catch(e){
+                console.error(e);
+                resolve(false);
+            }
+        });
+    }
+
 
     export async function addDevice(device: {name: string, company: string, state: number}): Promise<boolean> {
         return new Promise<boolean>(async resolve=>{

@@ -50,9 +50,16 @@
       "disabled": false
     },
     "/device": {
-      "fileName": "Device",
+      "fileName": "AddDevice",
       "methods": [
         "POST"
+      ],
+      "disabled": false
+    },
+    "/device/:id/remove": {
+      "fileName": "RemoveDevice",
+      "methods": [
+        "DELETE"
       ],
       "disabled": false
     },

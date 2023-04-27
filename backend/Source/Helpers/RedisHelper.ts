@@ -109,6 +109,23 @@ namespace RedisHelper {
         })
     }
 
+    export async function removeDevice(deviceId: string): Promise<boolean>{
+        return new Promise<boolean>(async resolve=>{
+           try{
+               let client = await getClient();
+               client.hDel("devices", deviceId).then(()=>{
+                   resolve(true);
+               }).catch(e=>{
+                   console.error(e);
+                   resolve(false);
+               })
+           }catch(e){
+               console.error(e);
+               resolve(false);
+           }
+        });
+    }
+
     export async function setDevices(devices: DeviceDTO[]): Promise<boolean> {
         return new Promise<boolean>(async resolve=>{
             try{
