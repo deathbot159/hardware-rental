@@ -9,7 +9,8 @@ namespace DatabaseHelper {
             auth: {
                 username: database.user,
                 password: database.password
-            }
+            },
+            directConnection: true
         });
     }
 
