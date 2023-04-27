@@ -1,12 +1,18 @@
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {useAlert} from "@/Context/AlertProvider";
+import {routes} from "@/Config";
+import axios from "axios";
+import {useDeviceData} from "@/Context/DeviceDataProvider";
+import {useRouter} from "next/router";
 
 type newDeviceData = {name: string, company: string, disabled: boolean, tryingToAdd: boolean}
 
 export default function AddDeviceModal({showModal, setShowModal}:{showModal: boolean, setShowModal: any}){
+    const {refreshData} = useDeviceData();
     const [newDeviceData, setNewDeviceData] = useState({name: "", company: "", disabled: false, tryingToAdd: false} as newDeviceData)
     const {editAlert} = useAlert();
+    const {push} = useRouter();
 
     const handleClose = ()=>{
         if(!newDeviceData.tryingToAdd) {
@@ -28,7 +34,39 @@ export default function AddDeviceModal({showModal, setShowModal}:{showModal: boo
                 toggleButtons()
                 return;
             }
-
+            axios.post(routes.addDevice , {
+                "name": name,
+                "company": company,
+                "disabled": disabled
+            }, {
+                "headers": {"x-access-token": localStorage.getItem("token")},
+            }).then(resp=>{
+                refreshData();
+                editAlert(true, "success", `Successfully added device ${company} ${name}`);
+            }).catch(e=>{
+                if(e.response) {
+                    if (e.response.data.status == 2) {
+                        localStorage.removeItem("token");
+                        editAlert(true, "danger", "Invalid token. Please, log in again.");
+                        push("/auth");
+                        return;
+                    }
+                    if (e.response.data.status == 4) {
+                        editAlert(true, "warning", "Invalid permissions.");
+                        push("/");
+                        return;
+                    }
+                    if (e.response.data.status == 5) {
+                        editAlert(true, "danger", "Try again ;)");
+                        return;
+                    }
+                    if (e.response.data.status == -1) {
+                        editAlert(true, "danger", "Unknown error.");
+                        return;
+                    }
+                }else
+                    editAlert(true, "danger", "Cannot add device. API error.");
+            })
             handleClose();
         }
     }
