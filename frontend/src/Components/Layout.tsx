@@ -14,9 +14,10 @@ export default function Layout({children, HeaderText}: {children?: ReactNode, He
     const {loaderSettings} = useLoader();
     const {alertOptions, changeAlertVisibility} = useAlert();
 
+
     return(
         <DeviceDataProvider>
-            <Loader visible={loaderSettings.visible}>""</Loader>
+            <Loader visible={loaderSettings.visible}>&quot;&quot;</Loader>
             <Container fluid className={styles.dashboard}>
                 <Row>
                     <Col className={styles.leftCol} lg={2}>

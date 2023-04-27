@@ -10,7 +10,7 @@ let routes = {
     returnDevice: (devId: string) => `${apiAddress}/user/me/rentdevice/${devId}/return`,
     "addDevice": `${apiAddress}/device`,
     removeDevice: (devId: string) => `${apiAddress}/device/${devId}/remove`,
-    editRoute: (devId: string) =>  `${apiAddress}/device/${devId}/edit`
+    editDevice: (devId: string) =>  `${apiAddress}/device/${devId}/edit`
 }
 
 

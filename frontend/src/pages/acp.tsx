@@ -3,7 +3,7 @@ import Layout from "@/Components/Layout";
 import acpStyles from "@/Styles/Pages/acp.module.scss"
 import ButtonStyles from "@/Styles/New/Buttons.module.scss"
 import List from "@/Components/List";
-import AddDeviceModal from "@/Components/ACP/AddDeviceModal";
+import DeviceModal from "@/Components/ACP/DeviceModal";
 import {useEffect, useState} from "react";
 import {useSession} from "@/Context/SessionProvider";
 import {checkToken} from "@/Helpers/Token";
@@ -17,6 +17,7 @@ export default function AdminControlPanel(){
     const {editAlert} = useAlert();
     const columnHead = [{key: "name", text: "Name & Company", sortable: true}, {key: "date", text:"Date", sortable: true}, {key: "availability", text: "Availability", sortable: true}, {key: "acpActions", text: "Actions"}];
     const [showModal, setShowModal] = useState(false);
+    const [modalSettings, setModalSettings] = useState({deviceId: "", type: "add"} as {deviceId: string, type: "add"|"edit"});
     const {push} = useRouter();
 
     useEffect(()=>{
@@ -50,18 +51,15 @@ export default function AdminControlPanel(){
         })
     }, [])
 
-    let handleShow = ()=>{
+
+    const showEditModal = (devId: string) =>{
+        setModalSettings({deviceId: devId, type: "edit"});
         setShowModal(true);
     }
 
-    let handleEdit = (devId: string) =>{
-        alert(`Edit: ${devId}`);
-    }
-    let handleSendToRepair = (devId: string) =>{
-        alert(`STR: ${devId}`);
-    }
-    let handleRemove = (devId: string) =>{
-        alert(`Remove: ${devId}`);
+    const showAddModal = () => {
+        setModalSettings({deviceId: "", type: "add"});
+        setShowModal(true);
     }
 
     return(
@@ -72,10 +70,10 @@ export default function AdminControlPanel(){
                 </Head>
                 <Layout HeaderText={"Admin Control Panel"}>
                     <div className={acpStyles.controlBox}>
-                        <button className={`${acpStyles.addButton} ${ButtonStyles.button} ${ButtonStyles.green}`} onClick={handleShow}><i className={"fi fi-br-plus-small"}></i> Add device</button>
+                        <button className={`${acpStyles.addButton} ${ButtonStyles.button} ${ButtonStyles.green}`} onClick={showAddModal}><i className={"fi fi-br-plus-small"}></i> Add device</button>
                     </div>
-                    <List columnHeadData={columnHead} buttonClickHandler={[handleEdit, handleSendToRepair, handleRemove]}/>
-                    <AddDeviceModal showModal={showModal} setShowModal={setShowModal}/>
+                    <List columnHeadData={columnHead} buttonClickHandler={[showEditModal]}/>
+                    <DeviceModal showModal={showModal} setShowModal={setShowModal} modalType={modalSettings.type} setDeviceId={(id: string)=>setModalSettings(prev=>({...prev, deviceId: id}))} deviceId={modalSettings.deviceId}/>
                 </Layout>
             </>}
 

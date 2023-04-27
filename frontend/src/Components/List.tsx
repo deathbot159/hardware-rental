@@ -126,14 +126,14 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
         })
     }
 
-    const handleEdit = (devId: string, data: any,  sendToRepair: boolean = false) => {
+    const handleSendToRepair = (devId: string) => {
         let device = devices.find(d=>d.id==devId)!;
-        axios.put(routes.editRoute(devId), sendToRepair?{
+        axios.put(routes.editDevice(devId), {
             "state": device.state == DeviceState.InRepair? DeviceState._: DeviceState.InRepair
-        }: {}, {
+        }, {
             "headers": {"x-access-token": localStorage.getItem("token")}
         }).then(resp=>{
-            editAlert(true, "success", `${!sendToRepair?"Edited device":"Device"} ${device.name}${sendToRepair?` ${device.state==DeviceState._?"was sent to":"came back from"} repair`:""}.`);
+            editAlert(true, "success", `Device ${device.name} ${device.state==DeviceState._?"was sent to":"came back from"} repair.`);
             refreshData();
         }).catch(e=>{
             if(e.response) {
@@ -161,7 +161,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                     return;
                 }
             }else
-                editAlert(true, "danger", "Cannot edit device. API error.");
+                editAlert(true, "danger", "Cannot send device to repair. API error.");
         })
     }
 
@@ -232,7 +232,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                 key == "acpActions"?
                                     <DropdownButton as={ButtonGroup} title={"Actions"}>
                                         <DropdownItem eventKey={1} onClick={()=>buttonClickHandler[0](deviceData.id)}>📄 Edit device</DropdownItem>
-                                        <DropdownItem eventKey={2} onClick={()=>handleEdit(deviceData.id, {}, true)}>🔧 {deviceData.state == DeviceState.InRepair?"Make avilable.":"Send to repair"}</DropdownItem>
+                                        <DropdownItem eventKey={2} onClick={()=>handleSendToRepair(deviceData.id)}>🔧 {deviceData.state == DeviceState.InRepair?"Make avilable.":"Send to repair"}</DropdownItem>
                                         <DropdownItem eventKey={3} onClick={()=>handleRemove(deviceData.id)}>❌ Remove device</DropdownItem>
                                     </DropdownButton> :
                                     "<invalid key>"
