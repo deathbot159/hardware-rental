@@ -44,7 +44,6 @@ let route: RouteController = {
         let edits: any = {}
         bodyKeys.forEach(v=>edits[v] = req.body[v]);
         edits["id"] = devId;
-        console.log(edits);
         if(!(await DeviceService.editDevice(edits))){
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR, "Cannot edit this device.").toJSON()
