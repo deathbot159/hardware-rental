@@ -16,7 +16,13 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
     const [loadingDevices, setLoadingDevices] = useState(true);
     const {push} = useRouter();
 
-    useEffect(()=>{
+    useEffect(()=> refreshData(), [sessionData]);
+
+    const setDevices = (devices: IDevice[]) => {
+        setDevicesState(devices);
+    }
+
+    const refreshData = ()=>{
         let token = localStorage.getItem("token");
         if(token == null){
             editAlert(true, "danger", "Nullified token detected. Please log in again.");
@@ -37,14 +43,6 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
                 push("/auth");
             })
         }
-    }, [editAlert, push, sessionData]);
-
-    const setDevices = (devices: IDevice[]) => {
-        setDevicesState(devices);
-    }
-
-    const refreshData = ()=>{
-
     }
 
     const rentDevice = (deviceId: string) => {

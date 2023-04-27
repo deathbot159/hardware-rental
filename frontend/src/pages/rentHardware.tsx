@@ -1,7 +1,6 @@
 import Head from "next/head";
 import Layout from "@/Components/Layout";
 import List from "@/Components/List";
-import {useState} from "react";
 
 export default function RentHardware(){
     let columnHead = [{key: "name", text: "Name & Company", sortable: true}, {key: "date", text:"Date", sortable: true}, {key: "returnBtn", text: "Return"}];

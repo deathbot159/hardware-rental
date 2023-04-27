@@ -4,7 +4,8 @@ let routes = {
     "token": `${apiAddress}/token`,
     "authorize": `${apiAddress}/authorize`,
     "currentUserInfo": `${apiAddress}/user/me`,
-    "devices": `${apiAddress}/devices`
+    "devices": `${apiAddress}/devices`,
+    rentDevice: (devId: string) => `${apiAddress}/device/${devId}/rent`
 }
 
 

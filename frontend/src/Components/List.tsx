@@ -2,22 +2,25 @@ import styles from "@/Styles/Components/List.module.scss"
 import ButtonStyles from "@/Styles/New/Buttons.module.scss"
 import moment from "moment/moment";
 import listStyles from "@/Styles/Components/List.module.scss";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {ButtonGroup, DropdownButton} from "react-bootstrap";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import {useDeviceData} from "@/Context/DeviceDataProvider";
 import {DeviceState} from "@/Helpers/DeviceState";
 import {useSession} from "@/Context/SessionProvider";
-import {IDevice} from "@/@Types/DeviceDataTypes";
 import {useRouter} from "next/router";
+import axios from "axios";
+import {routes} from "@/Config";
+import {useAlert} from "@/Context/AlertProvider";
 
 type Sorting = {sortByKey: string, sortOrder: "asc"|"desc"}
 
 export default function List({columnHeadData, buttonClickHandler}: {columnHeadData: {key:string, text:string, sortable?: boolean}[], buttonClickHandler: ((elId: string)=>void)[]}){
     const {rentDevices, setRentDevices} = useSession();
-    const {devices, setDevices, loadingDevices} = useDeviceData();
+    const {devices, setDevices, loadingDevices, refreshData} = useDeviceData();
+    const {editAlert} = useAlert();
     const [sortingBy, setSortingBy] = useState({sortByKey: columnHeadData.filter(d=>d.sortable)[0].key, sortOrder: "asc"} as Sorting);
-    const {pathname} = useRouter();
+    const {pathname, push} = useRouter();
 
     const handleSorting = (key: string)=> {
         if(sortingBy.sortByKey == key)
@@ -44,6 +47,28 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                     return (a[sortingBy.sortByKey] < b[sortingBy.sortByKey])?-1:1;
                 }
             }))
+    }
+
+    const handleRent = (devId: string) => {
+        axios.post(routes.rentDevice(devId), {} ,{
+            "headers": {"x-access-token": localStorage.getItem("token")}
+        }).then(resp=>{
+            if(resp.status == 200){
+                refreshData();
+                editAlert(true, "success", `Successfully rent device ${devices.find(d=>d.id==devId)!.name}`);
+            }else{
+                if(resp.data.status == 2){
+                    editAlert(true, "danger", "Invalid/deprecated token. Please, log in again.");
+                    localStorage.removeItem("token");
+                    push("/auth")
+                }else{
+                    editAlert(true, "danger", "Cannot rent device.");
+                }
+            }
+        }).catch(e=>{
+            localStorage.removeItem("token")
+            push("/auth")
+        })
     }
 
     return <>
@@ -107,7 +132,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                 key == "rentBtn"?
                                     <button
                                         className={`${ButtonStyles.button} ${deviceData.availability==0 ? ButtonStyles.green: `${ButtonStyles.gray} ${ButtonStyles.blocked}`}`}
-                                        onClick={()=>deviceData.availability==0? buttonClickHandler[0](deviceData.id):""}>
+                                        onClick={()=>deviceData.availability==0? handleRent(deviceData.id):""}>
                                         Rent
                                     </button>:
                                 key == "returnBtn"?
