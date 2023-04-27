@@ -1,4 +1,4 @@
-import {createContext, ReactNode, useContext, useState} from "react";
+import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {AlertOptionsType, AlertVariants, IAlert} from "@/@Types/AlertOptionsTypes";
 
 export const AlertContext = createContext<AlertOptionsType | null>(null);
@@ -11,6 +11,12 @@ export default function AlertProvider({children}: {children: ReactNode}){
             text: ""
         } as IAlert
     );
+
+    useEffect(()=>{
+        setTimeout(()=>{
+            setAlertOptions(prev=>({...prev, show: false}));
+        }, 6000);
+    }, [alertOptions.show]);
 
     const changeAlertVisibility = (visibility: boolean) => {
         setAlertOptions(prev=>({...prev, show: visibility}));
@@ -38,6 +44,6 @@ export default function AlertProvider({children}: {children: ReactNode}){
 export const useAlert = ()=>{
     const context = useContext(AlertContext);
     if(!context)
-        throw new Error("useApplication must be used inside a `ApplicationProvider`.");
+        throw new Error("useAlert must be used inside a `AlertProvider`.");
     return context;
 }
