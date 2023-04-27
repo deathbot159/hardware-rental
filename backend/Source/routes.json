@@ -35,6 +35,13 @@
       ],
       "disabled": false
     },
+    "/user/me/rentdevice/:id/return": {
+      "fileName": "ReturnDevice",
+      "methods": [
+        "DELETE"
+      ],
+      "disabled": false
+    },
     "/devices": {
       "fileName": "Devices",
       "methods": [

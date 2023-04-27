@@ -90,6 +90,30 @@ namespace DeviceService {
             }
         })
     }
+    export async function returnDevice(deviceId: string, accountId: string): Promise<boolean> {
+        return new Promise<boolean>(async resolve => {
+            let session = null;
+            try {
+                let client = await getConnection();
+                session = client.startSession();
+                session.startTransaction();
+                let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
+                let deleteResult = await collection.deleteOne({deviceId: deviceId, accountId: accountId}, {session})
+                let deviceCollection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
+                let updateResult = await deviceCollection.updateOne({id: deviceId}, {$set: {state: DeviceState._}}, {session})
+                await session.commitTransaction();
+                await client.close()
+                resolve(true)
+            } catch (e) {
+                console.error(e);
+                if(session) await session.abortTransaction();
+                resolve(false)
+            }finally {
+                if(session) await session!.endSession()
+            }
+        })
+    }
+
 
     export async function addDevice(device: {name: string, company: string, state: number}): Promise<boolean> {
         return new Promise<boolean>(async resolve=>{
