@@ -5,7 +5,7 @@ import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import DeviceService from "../Services/DeviceService";
 import rentDevice = DeviceService.rentDevice;
 import RedisHelper from "../../../Helpers/RedisHelper";
-import Device from "./Device";
+import Device from "./AddDevice";
 import {DeviceState} from "../../../Helpers/DeviceState";
 
 let route: RouteController = {
