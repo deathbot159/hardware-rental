@@ -3,6 +3,8 @@ import {database} from "../../../Config.json"
 import {DatabaseResponse, DatabaseResponseStatus} from "../../../Helpers/DatabaseResponse";
 import RedisHelper from "../../../Helpers/RedisHelper";
 import DatabaseHelper from "../../../Helpers/DatabaseHelper";
+import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
+import devices from "../Routes/Devices";
 
 
 namespace AccountService {
@@ -96,6 +98,36 @@ namespace AccountService {
                resolve({status: DatabaseResponseStatus.DB_ERROR})
            }
         });
+    }
+
+    export async function getRentDevices(userId: string): Promise<RentDeviceDTO[]>{
+        return new Promise<RentDeviceDTO[]>(async resolve => {
+            try {
+                let client = await getConnection();
+                let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
+                let data = await collection.find({accountId: userId}).toArray();
+                await client.close();
+                resolve(data.length != 0 ? data : [])
+            }catch (e) {
+                console.error(e);
+                resolve([]);
+            }
+        })
+    }
+
+    export async function getRentDeviceById(userId: string, devId: string): Promise<RentDeviceDTO|null>{
+        return new Promise<RentDeviceDTO|null>(async resolve=>{
+            try{
+                let client = await getConnection();
+                let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
+                let data = await collection.findOne({accountId: userId, deviceId: devId});
+                await client.close();
+                resolve(data)
+            }catch(e){
+                console.error(e);
+                resolve(null)
+            }
+        })
     }
 }
 

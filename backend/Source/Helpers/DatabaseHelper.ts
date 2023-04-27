@@ -28,21 +28,6 @@ namespace DatabaseHelper {
             }
         });
     }
-
-    export async function getRentDevices(userId: string): Promise<RentDeviceDTO[]>{
-        return new Promise<RentDeviceDTO[]>(async resolve => {
-            try {
-                let client = await getConnection();
-                let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
-                let data = await collection.find({accountId: userId}).toArray();
-                await client.close();
-                resolve(data.length != 0 ? data : [])
-            }catch (e) {
-                console.error(e);
-                resolve([]);
-            }
-        })
-    }
 }
 
 export default DatabaseHelper;
