@@ -5,7 +5,8 @@ enum APIResponseStatus {
     INVALID_TOKEN,
     DATA_NOT_FOUND,
     INVALID_PERMISSIONS,
-    INVALID_REQUEST_BODY
+    INVALID_REQUEST_BODY,
+    INVALID_REQUEST_QUERY
 }
 
 export default APIResponseStatus;

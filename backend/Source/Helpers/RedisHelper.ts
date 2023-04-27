@@ -92,6 +92,23 @@ namespace RedisHelper {
         })
     }
 
+    export async function getDevice(deviceId: string): Promise<DeviceDTO|null> {
+        return new Promise<DeviceDTO|null>(async resolve => {
+            try {
+                let client = await getClient();
+                client.hGet("devices", deviceId).then(data => {
+                    resolve(JSON.parse(data!) as DeviceDTO);
+                }).catch(e => {
+                    console.error(e);
+                    resolve(null);
+                })
+            } catch (e) {
+                console.error(e)
+                resolve(null);
+            }
+        })
+    }
+
     export async function setDevices(devices: DeviceDTO[]): Promise<boolean> {
         return new Promise<boolean>(async resolve=>{
             try{

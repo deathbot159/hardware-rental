@@ -48,6 +48,13 @@
         "POST"
       ],
       "disabled": false
+    },
+    "/device/:id/rent": {
+      "fileName": "RentDevice",
+      "methods": [
+        "POST"
+      ],
+      "disabled": false
     }
   }
 }
