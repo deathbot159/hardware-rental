@@ -54,7 +54,7 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
             "disabled": state
         }, {
             "headers": {"x-access-token": localStorage.getItem("token")},
-        }).then(resp => {
+        }).then(() => {
             refreshData();
             editAlert(true, "success", `Successfully added device ${company} ${name}`);
         }).catch(e => {
@@ -100,7 +100,7 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
             "state": state?DeviceState.Disabled:DeviceState._
         }, {
             "headers": {"x-access-token": localStorage.getItem("token")},
-        }).then(resp => {
+        }).then(() => {
             refreshData();
             editAlert(true, "success", `Successfully edited device ${originalData.name}`);
         }).catch(e => {
@@ -176,7 +176,7 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
                 <InputGroup.Checkbox
                     aria-label="Disable checkbox"
                     checked={modalType=="add"?false:deviceData.state}
-                    onChange={(ev: any)=>handleInput("state", !deviceData.state)}
+                    onChange={()=>handleInput("state", !deviceData.state)}
                 />
             </InputGroup>
         </Modal.Body>

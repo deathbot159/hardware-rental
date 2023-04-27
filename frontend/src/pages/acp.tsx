@@ -41,11 +41,11 @@ export default function AdminControlPanel(){
                     editAlert(true, "warning", "Invalid permissions.");
                     push("/")
                 }
-            }).catch(e=>{
+            }).catch(()=>{
                 localStorage.removeItem("token");
                 push("/auth")
             })
-        }).catch(e=>{
+        }).catch(()=>{
             localStorage.removeItem("token");
             push("/auth")
         })

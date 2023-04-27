@@ -50,14 +50,14 @@ export default function SessionProvider({children}: {children: ReactNode}){
                             }))
                             setRentDevicesState(rentDevices);
                         }
-                    }).catch(e => {
+                    }).catch(() => {
                         localStorage.removeItem("token");
                         push("/auth");
                     })
 
                     showLoader(false);
                 }
-            }).catch(e => {
+            }).catch(() => {
                 localStorage.removeItem("token");
                 push("/auth")
             })
@@ -88,7 +88,7 @@ export default function SessionProvider({children}: {children: ReactNode}){
                     push("/auth")
                 }
             })
-        }).catch(e=>{
+        }).catch(()=>{
             localStorage.removeItem("token");
             push("/auth")
         })

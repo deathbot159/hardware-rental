@@ -4,9 +4,7 @@ import {database} from "../../../Config.json"
 import RedisHelper from "../../../Helpers/RedisHelper";
 import {v4} from "uuid";
 import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
-import RentDevices from "../Routes/RentDevices";
 import {DeviceState} from "../../../Helpers/DeviceState";
-import devices from "../Routes/Devices";
 
 namespace DeviceService {
     import getConnection = DatabaseHelper.getConnection;
@@ -76,9 +74,9 @@ namespace DeviceService {
                 session = client.startSession();
                 session.startTransaction();
                 let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
-                let insertResult = await collection.insertOne({deviceId: deviceId, accountId: accountId, date: new Date().getTime()}, {session})
+                await collection.insertOne({deviceId: deviceId, accountId: accountId, date: new Date().getTime()}, {session})
                 let deviceCollection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
-                let updateResult = await deviceCollection.updateOne({id: deviceId}, {$set: {state: DeviceState.Rent}}, {session})
+                await deviceCollection.updateOne({id: deviceId}, {$set: {state: DeviceState.Rent}}, {session})
                 await session.commitTransaction();
                 await client.close()
                 resolve(true)
@@ -99,9 +97,9 @@ namespace DeviceService {
                 session = client.startSession();
                 session.startTransaction();
                 let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
-                let deleteResult = await collection.deleteOne({deviceId: deviceId, accountId: accountId}, {session})
+                await collection.deleteOne({deviceId: deviceId, accountId: accountId}, {session})
                 let deviceCollection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
-                let updateResult = await deviceCollection.updateOne({id: deviceId}, {$set: {state: DeviceState._}}, {session})
+                await deviceCollection.updateOne({id: deviceId}, {$set: {state: DeviceState._}}, {session})
                 await session.commitTransaction();
                 await client.close()
                 resolve(true)
@@ -127,7 +125,7 @@ namespace DeviceService {
                 let isRented = !!(await rentDevicesCollection.findOne({deviceId: deviceId}));
                 if(exists && !isRented) {
                     if(await RedisHelper.removeDevice(deviceId)) {
-                        let deleteResult = await deviceCollection.deleteOne({id: deviceId});
+                        await deviceCollection.deleteOne({id: deviceId});
                         success = true;
                     }else{
                         success = false;
@@ -149,7 +147,7 @@ namespace DeviceService {
                 let client = await getConnection();
                 let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                 let data: DeviceDTO = {...device, date: new Date().getTime(), id: v4()}
-                let res = await collection.insertOne(data);
+                await collection.insertOne(data);
                 await client.close();
                 await RedisHelper.addDevice(data);
                 resolve(true);
@@ -169,7 +167,7 @@ namespace DeviceService {
                 if(deviceData) {
                     if(deviceData.state != DeviceState.Rent){
                         let {id: _, ...data} = {...device, date: new Date().getTime()};
-                        let updateResult = await collection.updateOne({id: device.id}, {$set: {...data}});
+                        await collection.updateOne({id: device.id}, {$set: {...data}});
                         await RedisHelper.addDevice({...deviceData, ...data});
                         success = true;
                     }

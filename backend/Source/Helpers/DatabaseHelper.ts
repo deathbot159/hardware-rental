@@ -1,7 +1,6 @@
 import {MongoClient} from "mongodb";
 import {database} from "../Config.json"
 import AccountDTO from "../DTOs/AccountDTO";
-import RentDeviceDTO from "../DTOs/RentDeviceDTO";
 
 namespace DatabaseHelper {
     export function getConnection() {

@@ -65,7 +65,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                     editAlert(true, "danger", "Cannot rent device.");
                 }
             }
-        }).catch(e=>{
+        }).catch(()=>{
             localStorage.removeItem("token")
             push("/auth")
         })
@@ -88,7 +88,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                     editAlert(true, "danger", "Cannot rent device.");
                 }
             }
-        }).catch(e=>{
+        }).catch(()=>{
             localStorage.removeItem("token");
             push("/auth")
         })
@@ -97,7 +97,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
     const handleRemove = (devId: string) => {
         axios.delete(routes.removeDevice(devId), {
             "headers": {"x-access-token": localStorage.getItem("token")}
-        }).then(resp=>{
+        }).then(()=>{
             editAlert(true, "success", `Removed device ${devices.find(d=>d.id==devId)!.name}.`);
             refreshData();
         }).catch(e=>{
@@ -132,7 +132,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
             "state": device.state == DeviceState.InRepair? DeviceState._: DeviceState.InRepair
         }, {
             "headers": {"x-access-token": localStorage.getItem("token")}
-        }).then(resp=>{
+        }).then(()=>{
             editAlert(true, "success", `Device ${device.name} ${device.state==DeviceState._?"was sent to":"came back from"} repair.`);
             refreshData();
         }).catch(e=>{

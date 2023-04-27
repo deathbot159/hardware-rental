@@ -4,7 +4,6 @@ import {DatabaseResponse, DatabaseResponseStatus} from "../../../Helpers/Databas
 import RedisHelper from "../../../Helpers/RedisHelper";
 import DatabaseHelper from "../../../Helpers/DatabaseHelper";
 import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
-import devices from "../Routes/Devices";
 
 
 namespace AccountService {
@@ -79,7 +78,7 @@ namespace AccountService {
         return new Promise<DatabaseResponse<Omit<AccountDTO, "password"> | any>>(async resolve => {
            try{
                let found = false;
-               let data: any = {};
+               let data: any;
                let fromCache = false;
                let accountData: any = await RedisHelper.getAccountById(userId);
                if (accountData.id != undefined) {
