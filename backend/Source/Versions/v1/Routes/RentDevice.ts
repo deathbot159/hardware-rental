@@ -17,7 +17,6 @@ let route: RouteController = {
             )
             return
         }
-        console.log(req.params);
         let deviceId = req.params.id;
         if (!deviceId) {
             res.status(400).send(
