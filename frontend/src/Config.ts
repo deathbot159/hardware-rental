@@ -8,7 +8,8 @@ let routes = {
     "rentDevices": `${apiAddress}/user/me/rentdevices`,
     rentDevice: (devId: string) => `${apiAddress}/device/${devId}/rent`,
     returnDevice: (devId: string) => `${apiAddress}/user/me/rentdevice/${devId}/return`,
-    "addDevice": `${apiAddress}/device`
+    "addDevice": `${apiAddress}/device`,
+    "removeDevice": (devId: string) => `${apiAddress}/device/${devId}/remove`
 }
 
 

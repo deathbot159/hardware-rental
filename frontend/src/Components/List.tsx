@@ -94,6 +94,38 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
         })
     }
 
+    const handleRemove = (devId: string) => {
+        axios.delete(routes.removeDevice(devId), {
+            "headers": {"x-access-token": localStorage.getItem("token")}
+        }).then(resp=>{
+            editAlert(true, "success", `Removed device ${devices.find(d=>d.id==devId)!.name}.`);
+            refreshData();
+        }).catch(e=>{
+            if(e.response) {
+                if (e.response.data.status == 2) {
+                    localStorage.removeItem("token");
+                    editAlert(true, "danger", "Invalid token. Please, log in again.");
+                    push("/auth");
+                    return;
+                }
+                if (e.response.data.status == 4) {
+                    editAlert(true, "warning", "Invalid permissions.");
+                    push("/");
+                    return;
+                }
+                if (e.response.data.status == 6) {
+                    editAlert(true, "danger", "Try again ;)");
+                    return;
+                }
+                if (e.response.data.status == -1) {
+                    editAlert(true, "danger", e.response.data.message);
+                    return;
+                }
+            }else
+                editAlert(true, "danger", "Cannot remove device. API error.");
+        })
+    }
+
     return <>
         <table className={styles.list}>
             <thead>
@@ -162,7 +194,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                     <DropdownButton as={ButtonGroup} title={"Actions"}>
                                         <DropdownItem eventKey={1} onClick={()=>buttonClickHandler[0](deviceData.id)}>📄 Edit device</DropdownItem>
                                         <DropdownItem eventKey={2} onClick={()=>buttonClickHandler[1](deviceData.id)}>🔧 Send to repair</DropdownItem>
-                                        <DropdownItem eventKey={3} onClick={()=>buttonClickHandler[2](deviceData.id)}>❌ Remove device</DropdownItem>
+                                        <DropdownItem eventKey={3} onClick={()=>handleRemove(deviceData.id)}>❌ Remove device</DropdownItem>
                                     </DropdownButton> :
                                     "<invalid key>"
                             }</td>
