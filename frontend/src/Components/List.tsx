@@ -1,7 +1,7 @@
 import styles from "@/Styles/Components/List.module.scss"
+import listStyles from "@/Styles/Components/List.module.scss"
 import ButtonStyles from "@/Styles/New/Buttons.module.scss"
 import moment from "moment/moment";
-import listStyles from "@/Styles/Components/List.module.scss";
 import {useState} from "react";
 import {ButtonGroup, DropdownButton} from "react-bootstrap";
 import DropdownItem from "react-bootstrap/DropdownItem";
@@ -126,6 +126,45 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
         })
     }
 
+    const handleEdit = (devId: string, data: any,  sendToRepair: boolean = false) => {
+        let device = devices.find(d=>d.id==devId)!;
+        axios.put(routes.editRoute(devId), sendToRepair?{
+            "state": device.state == DeviceState.InRepair? DeviceState._: DeviceState.InRepair
+        }: {}, {
+            "headers": {"x-access-token": localStorage.getItem("token")}
+        }).then(resp=>{
+            editAlert(true, "success", `${!sendToRepair?"Edited device":"Device"} ${device.name}${sendToRepair?` ${device.state==DeviceState._?"was sent to":"came back from"} repair`:""}.`);
+            refreshData();
+        }).catch(e=>{
+            if(e.response) {
+                if (e.response.data.status == 2) {
+                    localStorage.removeItem("token");
+                    editAlert(true, "danger", "Invalid token. Please, log in again.");
+                    push("/auth");
+                    return;
+                }
+                if (e.response.data.status == 4) {
+                    editAlert(true, "warning", "Invalid permissions.");
+                    push("/");
+                    return;
+                }
+                if(e.response.data.status == 5){
+                    editAlert(true, "danger", "Invalid request body.");
+                    return;
+                }
+                if (e.response.data.status == 6) {
+                    editAlert(true, "danger", "Try again ;)");
+                    return;
+                }
+                if (e.response.data.status == -1) {
+                    editAlert(true, "danger", e.response.data.message);
+                    return;
+                }
+            }else
+                editAlert(true, "danger", "Cannot edit device. API error.");
+        })
+    }
+
     return <>
         <table className={styles.list}>
             <thead>
@@ -193,7 +232,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                 key == "acpActions"?
                                     <DropdownButton as={ButtonGroup} title={"Actions"}>
                                         <DropdownItem eventKey={1} onClick={()=>buttonClickHandler[0](deviceData.id)}>📄 Edit device</DropdownItem>
-                                        <DropdownItem eventKey={2} onClick={()=>buttonClickHandler[1](deviceData.id)}>🔧 Send to repair</DropdownItem>
+                                        <DropdownItem eventKey={2} onClick={()=>handleEdit(deviceData.id, {}, true)}>🔧 {deviceData.state == DeviceState.InRepair?"Make avilable.":"Send to repair"}</DropdownItem>
                                         <DropdownItem eventKey={3} onClick={()=>handleRemove(deviceData.id)}>❌ Remove device</DropdownItem>
                                     </DropdownButton> :
                                     "<invalid key>"
