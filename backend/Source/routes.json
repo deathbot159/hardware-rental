@@ -63,6 +63,13 @@
       ],
       "disabled": false
     },
+    "/device/:id/edit": {
+      "fileName": "EditDevice",
+      "methods": [
+        "PUT"
+      ],
+      "disabled": false
+    },
     "/device/:id/rent": {
       "fileName": "RentDevice",
       "methods": [

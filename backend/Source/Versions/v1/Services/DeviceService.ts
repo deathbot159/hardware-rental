@@ -6,6 +6,7 @@ import {v4} from "uuid";
 import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
 import RentDevices from "../Routes/RentDevices";
 import {DeviceState} from "../../../Helpers/DeviceState";
+import devices from "../Routes/Devices";
 
 namespace DeviceService {
     import getConnection = DatabaseHelper.getConnection;
@@ -152,6 +153,27 @@ namespace DeviceService {
                 await client.close();
                 await RedisHelper.addDevice(data);
                 resolve(true);
+            }catch(e){
+                console.error(e);
+                resolve(false);
+            }
+        })
+    }
+    export async function editDevice(device: {id: string, name: string, company: string, state: number}): Promise<boolean>{
+        return new Promise<boolean>(async resolve=>{
+            let success = false;
+            try{
+                let client = await getConnection();
+                let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
+                let deviceData = await collection.findOne({id: device.id});
+                if(deviceData) {
+                    let {id: _, ...data} = {...device, date: new Date().getTime()};
+                    let updateResult = await collection.updateOne({id: device.id}, {$set: {...data}});
+                    await RedisHelper.addDevice({...deviceData, ...data});
+                    success = true;
+                }else success = false;
+                await client.close();
+                resolve(success);
             }catch(e){
                 console.error(e);
                 resolve(false);
