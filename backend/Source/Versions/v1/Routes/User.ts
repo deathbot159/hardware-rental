@@ -2,8 +2,6 @@ import {RouteController} from "../../../Helpers/Route";
 import buildResponse from "../Response";
 import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import TokenService from "../Services/TokenService";
-import RedisHelper from "../../../Helpers/RedisHelper";
-import DatabaseHelper from "../../../Helpers/DatabaseHelper";
 import AccountService from "../Services/AccountService";
 import GetAccountById = AccountService.GetAccountById;
 import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
@@ -30,7 +28,7 @@ let route: RouteController = {
         let accResp = (await GetAccountById(tokenData.id));
 
         if (accResp.data.id != undefined) {
-            let rentDevices = await DatabaseHelper.getRentDevices(tokenData.id);
+            let rentDevices = await AccountService.getRentDevices(tokenData.id);
             res.status(200).send(
                 buildResponse<{ name: string, avatar: string, admin: boolean, rentDevices: RentDeviceDTO[] }>
                 (APIResponseStatus.SUCCESS, "", accResp.fromCache,
