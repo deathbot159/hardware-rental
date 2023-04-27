@@ -167,10 +167,12 @@ namespace DeviceService {
                 let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                 let deviceData = await collection.findOne({id: device.id});
                 if(deviceData) {
-                    let {id: _, ...data} = {...device, date: new Date().getTime()};
-                    let updateResult = await collection.updateOne({id: device.id}, {$set: {...data}});
-                    await RedisHelper.addDevice({...deviceData, ...data});
-                    success = true;
+                    if(deviceData.state != DeviceState.Rent){
+                        let {id: _, ...data} = {...device, date: new Date().getTime()};
+                        let updateResult = await collection.updateOne({id: device.id}, {$set: {...data}});
+                        await RedisHelper.addDevice({...deviceData, ...data});
+                        success = true;
+                    }
                 }else success = false;
                 await client.close();
                 resolve(success);
