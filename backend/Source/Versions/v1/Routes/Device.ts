@@ -4,6 +4,7 @@ import buildResponse from "../Response";
 import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import AccountService from "../Services/AccountService";
 import DeviceService from "../Services/DeviceService";
+import {DeviceState} from "../../../Helpers/DeviceState";
 
 
 let route: RouteController = {
@@ -28,14 +29,14 @@ let route: RouteController = {
             )
             return
         }
-        let {name, company, state} = req.body;
-        if(name == undefined || company == undefined || state == undefined){
+        let {name, company, disabled} = req.body;
+        if(name == undefined || company == undefined || disabled == undefined){
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.INVALID_REQUEST_BODY).toJSON()
             )
             return
         }
-        if(!await DeviceService.addDevice({name, company, state})){
+        if(!await DeviceService.addDevice({name, company, state: !disabled?DeviceState._:DeviceState.Disabled})){
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR).toJSON()
             )
