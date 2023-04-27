@@ -20,7 +20,7 @@ let route: RouteController = {
         let deviceId = req.params.id;
         if (!deviceId) {
             res.status(400).send(
-                buildResponse<any>(APIResponseStatus.INVALID_REQUEST_QUERY).toJSON()
+                buildResponse<any>(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()
             )
             return
         }

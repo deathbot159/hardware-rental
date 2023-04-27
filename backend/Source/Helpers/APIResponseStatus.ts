@@ -6,7 +6,7 @@ enum APIResponseStatus {
     DATA_NOT_FOUND,
     INVALID_PERMISSIONS,
     INVALID_REQUEST_BODY,
-    INVALID_REQUEST_QUERY
+    INVALID_REQUEST_PARAMS
 }
 
 export default APIResponseStatus;

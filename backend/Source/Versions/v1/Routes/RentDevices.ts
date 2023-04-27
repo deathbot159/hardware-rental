@@ -2,8 +2,8 @@ import {RouteController} from "../../../Helpers/Route";
 import RouteService from "../Services/RouteService";
 import buildResponse from "../Response";
 import APIResponseStatus from "../../../Helpers/APIResponseStatus";
-import DatabaseHelper from "../../../Helpers/DatabaseHelper";
 import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
+import AccountService from "../Services/AccountService";
 
 let route: RouteController = {
     async handleGet(req, res) {
@@ -14,7 +14,7 @@ let route: RouteController = {
             )
             return
         }
-        let devices = await DatabaseHelper.getRentDevices(userId);
+        let devices = await AccountService.getRentDevices(userId);
         res.status(200).send(
             buildResponse<RentDeviceDTO[]>(APIResponseStatus.SUCCESS, "", false, devices).toJSON()
         )
