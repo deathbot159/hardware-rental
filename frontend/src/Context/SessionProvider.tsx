@@ -64,6 +64,36 @@ export default function SessionProvider({children}: {children: ReactNode}){
         }
     }, [pathname]);
 
+    const refreshRentDevices = ()=>{
+        let token = localStorage.getItem("token");
+        if(token == null) {
+            showLoader(true);
+            push("/auth");
+            return;
+        }
+        checkToken(token!).then(valid=>{
+            if (!valid) {
+                localStorage.removeItem("token");
+                push("/auth");
+                return;
+            }
+            axios.get(routes.rentDevices, {
+                "headers": {"x-access-token": token}
+            }).then(resp=>{
+                if(resp.status == 200){
+                    let {data} = resp.data;
+                    setRentDevicesState(data);
+                }else{
+                    localStorage.removeItem("token");
+                    push("/auth")
+                }
+            })
+        }).catch(e=>{
+            localStorage.removeItem("token");
+            push("/auth")
+        })
+    }
+
     const editSession = (sessionData: ISessionData) => {
         setSession(sessionData);
     }
@@ -73,7 +103,7 @@ export default function SessionProvider({children}: {children: ReactNode}){
     }
 
     return(
-        <SessionContext.Provider value={{sessionData: session, loadingRentDevices: false, rentDevices, setRentDevices, editSession}}>
+        <SessionContext.Provider value={{sessionData: session, loadingRentDevices: false, rentDevices, refreshRentDevices, setRentDevices, editSession}}>
             {children}
         </SessionContext.Provider>
     )

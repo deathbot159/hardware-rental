@@ -14,6 +14,7 @@ export type SessionType = {
     sessionData: ISessionData;
     rentDevices: IRentDevice[];
     loadingRentDevices: boolean;
+    refreshRentDevices: () => void;
     setRentDevices: (rentDevices: IRentDevice[]) => void;
     editSession: (sessionData: ISessionData) => void;
 }

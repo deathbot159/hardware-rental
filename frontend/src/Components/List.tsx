@@ -16,7 +16,7 @@ import {useAlert} from "@/Context/AlertProvider";
 type Sorting = {sortByKey: string, sortOrder: "asc"|"desc"}
 
 export default function List({columnHeadData, buttonClickHandler}: {columnHeadData: {key:string, text:string, sortable?: boolean}[], buttonClickHandler: ((elId: string)=>void)[]}){
-    const {rentDevices, setRentDevices} = useSession();
+    const {rentDevices, setRentDevices, refreshRentDevices} = useSession();
     const {devices, setDevices, loadingDevices, refreshData} = useDeviceData();
     const {editAlert} = useAlert();
     const [sortingBy, setSortingBy] = useState({sortByKey: columnHeadData.filter(d=>d.sortable)[0].key, sortOrder: "asc"} as Sorting);
@@ -55,7 +55,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
         }).then(resp=>{
             if(resp.status == 200){
                 refreshData();
-                editAlert(true, "success", `Successfully rent device ${devices.find(d=>d.id==devId)!.name}`);
+                editAlert(true, "success", `Successfully rent device ${devices.find(d=>d.id==devId)!.name}.`);
             }else{
                 if(resp.data.status == 2){
                     editAlert(true, "danger", "Invalid/deprecated token. Please, log in again.");
@@ -67,6 +67,29 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
             }
         }).catch(e=>{
             localStorage.removeItem("token")
+            push("/auth")
+        })
+    }
+
+    const handleReturn = (devId: string) => {
+        axios.delete(routes.returnDevice(devId), {
+            headers: {"x-access-token": localStorage.getItem("token")}
+        }).then(resp=>{
+            if(resp.status == 200){
+                refreshData();
+                refreshRentDevices();
+                editAlert(true, "success", `Successfully returned device ${devices.find(d=>d.id==devId)!.name}.`);
+            }else{
+                if(resp.data.status == 2){
+                    editAlert(true, "danger", "Invalid/deprecated token. Please, log in again.");
+                    localStorage.removeItem("token");
+                    push("/auth")
+                }else{
+                    editAlert(true, "danger", "Cannot rent device.");
+                }
+            }
+        }).catch(e=>{
+            localStorage.removeItem("token");
             push("/auth")
         })
     }
@@ -104,7 +127,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                         :key == "returnBtn"?
                                             <button
                                                 className={`${ButtonStyles.button} ${ButtonStyles.green}`}
-                                                onClick={()=>buttonClickHandler[0](d.id)}>
+                                                onClick={()=>handleReturn(d.id)}>
                                                 Return
                                             </button>:
                                         "<invalid key>"
@@ -134,12 +157,6 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                         className={`${ButtonStyles.button} ${deviceData.availability==0 ? ButtonStyles.green: `${ButtonStyles.gray} ${ButtonStyles.blocked}`}`}
                                         onClick={()=>deviceData.availability==0? handleRent(deviceData.id):""}>
                                         Rent
-                                    </button>:
-                                key == "returnBtn"?
-                                    <button
-                                        className={`${ButtonStyles.button} ${ButtonStyles.green}`}
-                                        onClick={()=>deviceData.availability==0? buttonClickHandler[0](deviceData.id):""}>
-                                        Return
                                     </button>:
                                 key == "acpActions"?
                                     <DropdownButton as={ButtonGroup} title={"Actions"}>

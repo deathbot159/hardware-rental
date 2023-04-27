@@ -5,7 +5,9 @@ let routes = {
     "authorize": `${apiAddress}/authorize`,
     "currentUserInfo": `${apiAddress}/user/me`,
     "devices": `${apiAddress}/devices`,
-    rentDevice: (devId: string) => `${apiAddress}/device/${devId}/rent`
+    "rentDevices": `${apiAddress}/user/me/rentdevices`,
+    rentDevice: (devId: string) => `${apiAddress}/device/${devId}/rent`,
+    returnDevice: (devId: string) => `${apiAddress}/user/me/rentdevice/${devId}/return`
 }
 
 
