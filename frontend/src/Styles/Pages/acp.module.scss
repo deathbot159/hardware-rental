@@ -5,5 +5,9 @@
   & > .addButton{
     height: 4vh;
     width: 14vw;
+    @media(max-width: 992px) {
+      height: fit-content;
+      width: fit-content;
+    }
   }
 }
