@@ -72,7 +72,7 @@ export default function AdminControlPanel(){
                 </Head>
                 <Layout HeaderText={"Admin Control Panel"}>
                     <div className={acpStyles.controlBox}>
-                        <button className={`${ButtonStyles.button} ${ButtonStyles.green}`} onClick={handleShow}>➕ Add device</button>
+                        <button className={`${acpStyles.addButton} ${ButtonStyles.button} ${ButtonStyles.green}`} onClick={handleShow}><i className={"fi fi-br-plus-small"}></i> Add device</button>
                     </div>
                     <List columnHeadData={columnHead} buttonClickHandler={[handleEdit, handleSendToRepair, handleRemove]}/>
                     <AddDeviceModal showModal={showModal} setShowModal={setShowModal}/>

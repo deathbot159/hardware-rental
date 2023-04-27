@@ -2,4 +2,8 @@
 .controlBox{
   width: 100%;
   text-align: center;
+  & > .addButton{
+    height: 4vh;
+    width: 14vw;
+  }
 }
