@@ -124,6 +124,36 @@ namespace API{
         });
     }
 
+    export async function addDevice({name, company, state}: {name: string, company: string, state: boolean}): Promise<APIResponse>{
+        return new Promise<APIResponse>(resolve => {
+            axios.post(routes.addDevice, {
+                "name": name,
+                "company": company,
+                "disabled": state
+            }, {
+                "headers": {"x-access-token": localStorage.getItem("token")},
+            }).then(() => {
+                resolve({success: true});
+            }).catch(e => {
+                if(e.response) {
+                    if (e.response.data.status == 2) {
+                        resolve({success: false, message: "Invalid token. Please, log in again."});
+                    }
+                    else if (e.response.data.status == 4) {
+                        resolve({success: false, message: "Invalid permissions."});
+                    }
+                    else if (e.response.data.status == 6) {
+                        resolve({success: false, message: "Try again."});
+                    }
+                    else if (e.response.data.status == -1) {
+                        resolve({success: false, message: e.response.data.message});
+                    }
+                }else
+                    resolve({success: true, message: "Cannot add device. API error."});
+            })
+        });
+    }
+
     export async function removeDevice(devId: string): Promise<APIResponse>{
         return new Promise<APIResponse>(resolve => {
             axios.delete(routes.removeDevice(devId), {
@@ -146,6 +176,39 @@ namespace API{
                     }
                 }else
                    resolve({success: true, message: "Cannot remove device. API error."});
+            })
+        });
+    }
+
+    export async function editDevice(devId: string, data: {name: string, company: string, state: DeviceState}): Promise<APIResponse>{
+        return new Promise<APIResponse>(resolve => {
+            axios.put(routes.editDevice(devId), {
+                "name": data.name,
+                "company": data.company,
+                "state": data.state
+            }, {
+                "headers": {"x-access-token": localStorage.getItem("token")},
+            }).then(() => {
+                resolve({success: true});
+            }).catch(e => {
+                if (e.response) {
+                    if (e.response.data.status == 2) {
+                        resolve({success: false, message: "Invalid token. Please, log in again."});
+                    }
+                    else if (e.response.data.status == 4) {
+                        resolve({success: false, message: "Invalid permissions."});
+                    }
+                    else if (e.response.data.status == 5) {
+                        resolve({success: false, message: "Invalid request body."});
+                    }
+                    else if (e.response.data.status == 6) {
+                        resolve({success: false, message: "Try again."});
+                    }
+                    else if (e.response.data.status == -1) {
+                        resolve({success: false, message: e.response.data.message});
+                    }
+                } else
+                    resolve({success: false, message: "Cannot edit device. API error."});
             })
         });
     }

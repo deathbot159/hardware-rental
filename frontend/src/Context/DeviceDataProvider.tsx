@@ -2,8 +2,6 @@ import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {DeviceDataType, IDevice} from "@/@Types/DeviceDataTypes";
 import {useSession} from "@/Context/SessionProvider";
 import {useAlert} from "@/Context/AlertProvider";
-import axios from "axios";
-import {routes} from "@/Config";
 import {useRouter} from "next/router";
 import {DeviceState} from "@/Helpers/DeviceState";
 import API from "@/Helpers/API";

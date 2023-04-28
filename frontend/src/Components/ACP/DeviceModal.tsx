@@ -1,11 +1,10 @@
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {useAlert} from "@/Context/AlertProvider";
-import {routes} from "@/Config";
-import axios from "axios";
 import {useDeviceData} from "@/Context/DeviceDataProvider";
 import {useRouter} from "next/router";
 import {DeviceState} from "@/Helpers/DeviceState";
+import API from "@/Helpers/API";
 
 type deviceData = {name: string, company: string, state: boolean, tryingToExecute: boolean}
 
@@ -39,98 +38,65 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
         setDeviceData(prev=>({...prev, tryingToExecute: !prev.tryingToExecute}));
     }
 
-    const handleAdd = () => {
+    const handleAdd = async () => {
         if (deviceData.tryingToExecute) return;
         toggleButtons();
-        let {name, company, state} = deviceData;
+        let {name, company} = deviceData;
         if (name == "" || company == "") {
             editAlert(true, "warning", "Please, provide name and company of device.");
             toggleButtons()
             return;
         }
-        axios.post(routes.addDevice, {
-            "name": name,
-            "company": company,
-            "disabled": state
-        }, {
-            "headers": {"x-access-token": localStorage.getItem("token")},
-        }).then(() => {
+        let {success, message} = await API.addDevice(deviceData);
+        if(success){
             refreshData();
             editAlert(true, "success", `Successfully added device ${company} ${name}`);
-        }).catch(e => {
-            if (e.response) {
-                if (e.response.data.status == 2) {
-                    localStorage.removeItem("token");
-                    editAlert(true, "danger", "Invalid token. Please, log in again.");
-                    push("/auth");
-                    return;
-                }
-                if (e.response.data.status == 4) {
-                    editAlert(true, "warning", "Invalid permissions.");
-                    push("/");
-                    return;
-                }
-                if (e.response.data.status == 5) {
-                    editAlert(true, "danger", "Try again ;)");
-                    return;
-                }
-                if (e.response.data.status == -1) {
-                    editAlert(true, "danger", "Unknown error.");
-                    return;
-                }
-            } else
-                editAlert(true, "danger", "Cannot add device. API error.");
-        })
+        }else{
+            if(message?.includes("Invalid token")){
+                localStorage.removeItem("token");
+                editAlert(true, "danger", message!);
+                push("/auth");
+            }else if(message?.includes("Invalid permissions")){
+                editAlert(true, "warning", message!);
+                push("/");
+            }else{
+                editAlert(true, "danger", message!)
+            }
+        }
         handleClose();
     }
 
-    const handleEdit = (devId: string) =>{
+    const handleEdit = async (devId: string) => {
         if (deviceData.tryingToExecute) return;
         toggleButtons();
-        let originalData = devices.find(d=>d.id==devId)!;
+        let originalData = devices.find(d => d.id == devId)!;
         let {name, company, state} = deviceData;
         if (name == "" || company == "") {
             editAlert(true, "warning", "Please, provide name and company of device.");
             toggleButtons()
             return;
         }
-        axios.put(routes.editDevice(devId), {
-            "name": name == originalData.name?name.replace(originalData.company+" ", ""):name,
-            "company": company,
-            "state": state?DeviceState.Disabled:DeviceState._
-        }, {
-            "headers": {"x-access-token": localStorage.getItem("token")},
-        }).then(() => {
+        let {success, message} = await API.editDevice(devId,
+            {
+                name: name == originalData.name ? name.replace(originalData.company + " ", "") : name,
+                company: company,
+                state: state ? DeviceState.Disabled : DeviceState._
+            })
+        if(success){
             refreshData();
             editAlert(true, "success", `Successfully edited device ${originalData.name}`);
-        }).catch(e => {
-            if (e.response) {
-                if (e.response.data.status == 2) {
-                    localStorage.removeItem("token");
-                    editAlert(true, "danger", "Invalid token. Please, log in again.");
-                    push("/auth");
-                    return;
-                }
-                if (e.response.data.status == 4) {
-                    editAlert(true, "warning", "Invalid permissions.");
-                    push("/");
-                    return;
-                }
-                if(e.response.data.status == 5){
-                    editAlert(true, "danger", "Invalid request body.");
-                    return;
-                }
-                if (e.response.data.status == 6) {
-                    editAlert(true, "danger", "Try again ;)");
-                    return;
-                }
-                if (e.response.data.status == -1) {
-                    editAlert(true, "danger", e.response.data.message);
-                    return;
-                }
-            } else
-                editAlert(true, "danger", "Cannot edit device. API error.");
-        })
+        }else{
+            if(message?.includes("Invalid token")){
+                localStorage.removeItem("token");
+                editAlert(true, "danger", message!);
+                push("/auth");
+            }else if(message?.includes("Invalid permissions")){
+                editAlert(true, "warning", message!);
+                push("/");
+            }else{
+                editAlert(true, "danger", message!)
+            }
+        }
         handleClose();
     }
 
@@ -175,7 +141,7 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
                 <InputGroup.Text>Disabled</InputGroup.Text>
                 <InputGroup.Checkbox
                     aria-label="Disable checkbox"
-                    checked={modalType=="add"?false:deviceData.state}
+                    checked={deviceData.state}
                     onChange={()=>handleInput("state", !deviceData.state)}
                 />
             </InputGroup>
