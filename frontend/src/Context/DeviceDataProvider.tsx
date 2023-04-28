@@ -6,6 +6,7 @@ import axios from "axios";
 import {routes} from "@/Config";
 import {useRouter} from "next/router";
 import {DeviceState} from "@/Helpers/DeviceState";
+import API from "@/Helpers/API";
 
 export const DeviceDataContext = createContext<DeviceDataType | null>(null);
 
@@ -16,32 +17,32 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
     const [loadingDevices, setLoadingDevices] = useState(true);
     const {push} = useRouter();
 
-    useEffect(()=> refreshData(), [sessionData]);
+    useEffect(()=> {refreshData()}, [sessionData]);
 
     const setDevices = (devices: IDevice[]) => {
         setDevicesState(devices);
     }
 
-    const refreshData = ()=>{
+    const refreshData = async () => {
         let token = localStorage.getItem("token");
-        if(token == null){
+        if (token == null) {
             editAlert(true, "danger", "Nullified token detected. Please log in again.");
-        }else{
-            axios.get(routes.devices, {
-                "headers":{"x-access-token": localStorage.getItem("token")}
-            }).then(resp=>{
-                if(resp.status == 200){
-                    let devices: IDevice[] = resp.data.data;
-                    setDevicesState(
-                        devices.map(d=>({...d, name: `${d.company} ${d.name}` , availability: !sessionData.isAdmin? d.state != 0? DeviceState.NotAvilable: DeviceState._:d.state}))
-                            .sort((a,b)=>(a.name < b.name)?-1:1)
-                    );
-                }
+        } else {
+            let {success, data} = await API.getDevices();
+            if(success){
+                setDevicesState(
+                    data!.map(d => ({
+                        ...d,
+                        name: `${d.company} ${d.name}`,
+                        availability: !sessionData.isAdmin ? d.state != 0 ? DeviceState.NotAvilable : DeviceState._ : d.state
+                    }))
+                        .sort((a, b) => (a.name < b.name) ? -1 : 1)
+                );
                 setLoadingDevices(false);
-            }).catch(e=>{
+            }else{
                 localStorage.removeItem("token");
                 push("/auth");
-            })
+            }
         }
     }
 

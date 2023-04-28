@@ -3,6 +3,7 @@ import {routes} from "@/Config";
 import crypto from "crypto";
 import {DeviceState} from "@/Helpers/DeviceState";
 import {IRentDevice, ISessionData} from "@/@Types/SessionTypes";
+import {IDevice} from "@/@Types/DeviceDataTypes";
 
 type APIResponse<T=any> = {
     success: boolean,
@@ -40,7 +41,7 @@ namespace API{
         })
     }
 
-    export async function getUserInfo(): Promise<APIResponse<any>>{
+    export async function getUserInfo(): Promise<APIResponse>{
         return new Promise<APIResponse<ISessionData>>(resolve => {
             axios.get(routes.currentUserInfo, {
                 headers: {"x-access-token": localStorage.getItem("token")}
@@ -49,6 +50,19 @@ namespace API{
                     resolve({success: true, data: resp.data.data});
                 }
             }).catch(() => {
+                resolve({success: false});
+            })
+        });
+    }
+
+    export async function getDevices(): Promise<APIResponse<IDevice[]>>{
+        return new Promise<APIResponse<IDevice[]>>(resolve => {
+            axios.get(routes.devices, {
+                "headers":{"x-access-token": localStorage.getItem("token")}
+            }).then(resp=>{
+                let devices = resp.data.data
+                resolve({success: true, data: devices});
+            }).catch(e=>{
                 resolve({success: false});
             })
         });
