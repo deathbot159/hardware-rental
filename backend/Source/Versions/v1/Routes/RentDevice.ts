@@ -3,9 +3,9 @@ import RouteService from "../Services/RouteService";
 import buildResponse from "../Response";
 import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import DeviceService from "../Services/DeviceService";
-import rentDevice = DeviceService.rentDevice;
 import RedisHelper from "../../../Helpers/RedisHelper";
 import {DeviceState} from "../../../Helpers/DeviceState";
+import rentDevice = DeviceService.rentDevice;
 
 let route: RouteController = {
     async handlePost(req, res) {
@@ -25,7 +25,7 @@ let route: RouteController = {
         }
         let device = await DeviceService.getDevice(deviceId as string);
         if (device[0] != null && !(await DeviceService.isDeviceRent(deviceId as string))) {
-            if(!(await rentDevice(deviceId as string, userId))){
+            if (!(await rentDevice(deviceId as string, userId))) {
                 res.status(400).send(
                     buildResponse<any>(APIResponseStatus.ERROR, `Cannot rent device with id ${deviceId}.`).toJSON()
                 )

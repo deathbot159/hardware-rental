@@ -17,26 +17,26 @@ let route: RouteController = {
             return
         }
         let accResp = await AccountService.GetAccountById(userId);
-        if(accResp.data.id == undefined){
+        if (accResp.data.id == undefined) {
             res.status(401).send(
                 buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
-        if(accResp.data.authority != 1){
+        if (accResp.data.authority != 1) {
             res.status(403).send(
                 buildResponse<any>(APIResponseStatus.INVALID_PERMISSIONS).toJSON()
             )
             return
         }
         let {name, company, disabled} = req.body;
-        if(name == undefined || company == undefined || disabled == undefined){
+        if (name == undefined || company == undefined || disabled == undefined) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.INVALID_REQUEST_BODY).toJSON()
             )
             return
         }
-        if(!await DeviceService.addDevice({name, company, state: !disabled?DeviceState._:DeviceState.Disabled})){
+        if (!await DeviceService.addDevice({name, company, state: !disabled ? DeviceState._ : DeviceState.Disabled})) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR).toJSON()
             )

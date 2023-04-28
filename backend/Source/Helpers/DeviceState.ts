@@ -1,4 +1,4 @@
-enum DeviceState{
+enum DeviceState {
     _,
     Rent,
     Disabled,

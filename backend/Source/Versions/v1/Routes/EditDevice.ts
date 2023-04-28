@@ -35,16 +35,16 @@ let route: RouteController = {
             return
         }
         let bodyKeys = Object.keys(req.body);
-        if(bodyKeys.length == 0 || bodyKeys.length > 3 || (bodyKeys.length != 0 && bodyKeys.filter(k=>["name", "company", "state"].indexOf(k) < 0).length != 0)){
+        if (bodyKeys.length == 0 || bodyKeys.length > 3 || (bodyKeys.length != 0 && bodyKeys.filter(k => ["name", "company", "state"].indexOf(k) < 0).length != 0)) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.INVALID_REQUEST_BODY).toJSON()
             )
             return
         }
         let edits: any = {}
-        bodyKeys.forEach(v=>edits[v] = req.body[v]);
+        bodyKeys.forEach(v => edits[v] = req.body[v]);
         edits["id"] = devId;
-        if(!(await DeviceService.editDevice(edits))){
+        if (!(await DeviceService.editDevice(edits))) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR, "Cannot edit this device.").toJSON()
             )

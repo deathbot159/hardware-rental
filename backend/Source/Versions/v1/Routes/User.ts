@@ -3,8 +3,8 @@ import buildResponse from "../Response";
 import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import TokenService from "../Services/TokenService";
 import AccountService from "../Services/AccountService";
-import GetAccountById = AccountService.GetAccountById;
 import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
+import GetAccountById = AccountService.GetAccountById;
 
 
 let route: RouteController = {
@@ -32,7 +32,12 @@ let route: RouteController = {
             res.status(200).send(
                 buildResponse<{ name: string, avatar: string, admin: boolean, rentDevices: RentDeviceDTO[] }>
                 (APIResponseStatus.SUCCESS, "", accResp.fromCache,
-                    {name: accResp.data.name, avatar: accResp.data.avatar, admin: accResp.data.authority == 1, rentDevices}
+                    {
+                        name: accResp.data.name,
+                        avatar: accResp.data.avatar,
+                        admin: accResp.data.authority == 1,
+                        rentDevices
+                    }
                 ).toJSON()
             )
         } else {

@@ -1,6 +1,11 @@
 {
-    "watch": ["./"],
-    "ext": "ts,json",
-    "ignore": ["src/**/*.spec.ts", "out/"],
-    "exec": "npx ts-node Source/Application.ts"
+  "watch": [
+    "./"
+  ],
+  "ext": "ts,json",
+  "ignore": [
+    "src/**/*.spec.ts",
+    "out/"
+  ],
+  "exec": "npx ts-node Source/Application.ts"
 }

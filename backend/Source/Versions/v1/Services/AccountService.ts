@@ -74,32 +74,32 @@ namespace AccountService {
         })
     }
 
-    export async function GetAccountById(userId: string): Promise<DatabaseResponse<Omit<AccountDTO, "password"> | any>>{
+    export async function GetAccountById(userId: string): Promise<DatabaseResponse<Omit<AccountDTO, "password"> | any>> {
         return new Promise<DatabaseResponse<Omit<AccountDTO, "password"> | any>>(async resolve => {
-           try{
-               let found = false;
-               let data: any;
-               let fromCache = false;
-               let accountData: any = await RedisHelper.getAccountById(userId);
-               if (accountData.id != undefined) {
-                   fromCache = true;
-                   data = accountData
-               } else {
-                   data = await DatabaseHelper.getAccountById(userId);
-               }
-               if(data.id != undefined) found = true;
-               resolve({
-                   status: !found? DatabaseResponseStatus.NO_RESULTS: DatabaseResponseStatus.SUCCESS,
-                   fromCache: fromCache,
-                   data: data
-               })
-           } catch (e) {
-               resolve({status: DatabaseResponseStatus.DB_ERROR})
-           }
+            try {
+                let found = false;
+                let data: any;
+                let fromCache = false;
+                let accountData: any = await RedisHelper.getAccountById(userId);
+                if (accountData.id != undefined) {
+                    fromCache = true;
+                    data = accountData
+                } else {
+                    data = await DatabaseHelper.getAccountById(userId);
+                }
+                if (data.id != undefined) found = true;
+                resolve({
+                    status: !found ? DatabaseResponseStatus.NO_RESULTS : DatabaseResponseStatus.SUCCESS,
+                    fromCache: fromCache,
+                    data: data
+                })
+            } catch (e) {
+                resolve({status: DatabaseResponseStatus.DB_ERROR})
+            }
         });
     }
 
-    export async function getRentDevices(userId: string): Promise<RentDeviceDTO[]>{
+    export async function getRentDevices(userId: string): Promise<RentDeviceDTO[]> {
         return new Promise<RentDeviceDTO[]>(async resolve => {
             try {
                 let client = await getConnection();
@@ -107,22 +107,22 @@ namespace AccountService {
                 let data = await collection.find({accountId: userId}).toArray();
                 await client.close();
                 resolve(data.length != 0 ? data : [])
-            }catch (e) {
+            } catch (e) {
                 console.error(e);
                 resolve([]);
             }
         })
     }
 
-    export async function getRentDeviceById(userId: string, devId: string): Promise<RentDeviceDTO|null>{
-        return new Promise<RentDeviceDTO|null>(async resolve=>{
-            try{
+    export async function getRentDeviceById(userId: string, devId: string): Promise<RentDeviceDTO | null> {
+        return new Promise<RentDeviceDTO | null>(async resolve => {
+            try {
                 let client = await getConnection();
                 let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
                 let data = await collection.findOne({accountId: userId, deviceId: devId});
                 await client.close();
                 resolve(data)
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 resolve(null)
             }

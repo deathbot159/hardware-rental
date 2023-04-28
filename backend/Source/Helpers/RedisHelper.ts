@@ -74,26 +74,26 @@ namespace RedisHelper {
         })
     }
 
-    export async function getDevices(): Promise<DeviceDTO[]>{
-        return new Promise<DeviceDTO[]>(async resolve=>{
+    export async function getDevices(): Promise<DeviceDTO[]> {
+        return new Promise<DeviceDTO[]>(async resolve => {
             let devices: DeviceDTO[] = [];
-            try{
+            try {
                 let client = await getClient();
                 client.hGetAll("devices").then(async data => {
-                    resolve(Object.values(data as any).map(v=>JSON.parse(v as string)) as DeviceDTO[]);
-                }).catch(e=>{
+                    resolve(Object.values(data as any).map(v => JSON.parse(v as string)) as DeviceDTO[]);
+                }).catch(e => {
                     console.log(e);
                     resolve(devices)
                 })
-            }catch(e){
+            } catch (e) {
                 console.log(e);
                 resolve(devices)
             }
         })
     }
 
-    export async function getDevice(deviceId: string): Promise<DeviceDTO|null> {
-        return new Promise<DeviceDTO|null>(async resolve => {
+    export async function getDevice(deviceId: string): Promise<DeviceDTO | null> {
+        return new Promise<DeviceDTO | null>(async resolve => {
             try {
                 let client = await getClient();
                 client.hGet("devices", deviceId).then(data => {
@@ -109,43 +109,43 @@ namespace RedisHelper {
         })
     }
 
-    export async function removeDevice(deviceId: string): Promise<boolean>{
-        return new Promise<boolean>(async resolve=>{
-           try{
-               let client = await getClient();
-               client.hDel("devices", deviceId).then(()=>{
-                   resolve(true);
-               }).catch(e=>{
-                   console.error(e);
-                   resolve(false);
-               })
-           }catch(e){
-               console.error(e);
-               resolve(false);
-           }
+    export async function removeDevice(deviceId: string): Promise<boolean> {
+        return new Promise<boolean>(async resolve => {
+            try {
+                let client = await getClient();
+                client.hDel("devices", deviceId).then(() => {
+                    resolve(true);
+                }).catch(e => {
+                    console.error(e);
+                    resolve(false);
+                })
+            } catch (e) {
+                console.error(e);
+                resolve(false);
+            }
         });
     }
 
     export async function setDevices(devices: DeviceDTO[]): Promise<boolean> {
-        return new Promise<boolean>(async resolve=>{
-            try{
+        return new Promise<boolean>(async resolve => {
+            try {
                 let client = await getClient();
-                let data = devices.map(v=>[v.id, JSON.stringify(v)]).flat();
-                client.hSet("devices", data).then(()=>{
+                let data = devices.map(v => [v.id, JSON.stringify(v)]).flat();
+                client.hSet("devices", data).then(() => {
                     resolve(true);
-                }).catch(e=>{
+                }).catch(e => {
                     console.error(e);
                     resolve(false);
                 })
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 resolve(false);
             }
         })
     }
 
-    export async function addDevice(device: DeviceDTO): Promise<boolean>{
-        return new Promise<boolean>(async resolve=>{
+    export async function addDevice(device: DeviceDTO): Promise<boolean> {
+        return new Promise<boolean>(async resolve => {
             try {
                 let client = await getClient();
                 client.hSet("devices", [device.id, JSON.stringify(device)]).then(() => {
@@ -154,7 +154,7 @@ namespace RedisHelper {
                     console.error(e);
                     resolve(false);
                 })
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 resolve(false);
             }

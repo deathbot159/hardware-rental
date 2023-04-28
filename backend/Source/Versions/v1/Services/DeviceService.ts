@@ -14,14 +14,14 @@ namespace DeviceService {
             let fromCache = false;
             try {
                 let devices = await RedisHelper.getDevices();
-                if(devices.length == 0) {
+                if (devices.length == 0) {
                     let client = await getConnection();
                     let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                     let result = await collection.find();
                     devices = await result.toArray();
                     await client.close();
                     await RedisHelper.setDevices(devices);
-                }else fromCache = true;
+                } else fromCache = true;
                 resolve([devices, fromCache]);
             } catch (e) {
                 console.log(e);
@@ -30,8 +30,8 @@ namespace DeviceService {
         });
     }
 
-    export async function getDevice(deviceId: string): Promise<[DeviceDTO|null, boolean]> {
-        return new Promise<[DeviceDTO|null, boolean]>(async resolve => {
+    export async function getDevice(deviceId: string): Promise<[DeviceDTO | null, boolean]> {
+        return new Promise<[DeviceDTO | null, boolean]>(async resolve => {
             let fromCache = false;
             let data: DeviceDTO | null = null;
             try {
@@ -41,7 +41,7 @@ namespace DeviceService {
                     let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                     data = await collection.findOne({id: deviceId});
                     await client.close();
-                    if(data != null) await RedisHelper.addDevice(data);
+                    if (data != null) await RedisHelper.addDevice(data);
                 } else fromCache = true;
                 resolve([data, fromCache]);
             } catch (e) {
@@ -51,14 +51,14 @@ namespace DeviceService {
         });
     }
 
-    export async function isDeviceRent(deviceId: string): Promise<boolean>{
+    export async function isDeviceRent(deviceId: string): Promise<boolean> {
         return new Promise<boolean>(async resolve => {
             try {
                 let client = await getConnection();
                 let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
                 let data = await collection.findOne({deviceId: deviceId});
                 await client.close()
-                resolve(data!=null);
+                resolve(data != null);
             } catch (e) {
                 console.error(e);
                 resolve(false);
@@ -74,7 +74,11 @@ namespace DeviceService {
                 session = client.startSession();
                 session.startTransaction();
                 let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
-                await collection.insertOne({deviceId: deviceId, accountId: accountId, date: new Date().getTime()}, {session})
+                await collection.insertOne({
+                    deviceId: deviceId,
+                    accountId: accountId,
+                    date: new Date().getTime()
+                }, {session})
                 let deviceCollection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                 await deviceCollection.updateOne({id: deviceId}, {$set: {state: DeviceState.Rent}}, {session})
                 await session.commitTransaction();
@@ -82,13 +86,14 @@ namespace DeviceService {
                 resolve(true)
             } catch (e) {
                 console.error(e);
-                if(session) await session.abortTransaction();
+                if (session) await session.abortTransaction();
                 resolve(false)
-            }finally {
-                if(session) await session!.endSession()
+            } finally {
+                if (session) await session!.endSession()
             }
         })
     }
+
     export async function returnDevice(deviceId: string, accountId: string): Promise<boolean> {
         return new Promise<boolean>(async resolve => {
             let session = null;
@@ -105,17 +110,17 @@ namespace DeviceService {
                 resolve(true)
             } catch (e) {
                 console.error(e);
-                if(session) await session.abortTransaction();
+                if (session) await session.abortTransaction();
                 resolve(false)
-            }finally {
-                if(session) await session!.endSession()
+            } finally {
+                if (session) await session!.endSession()
             }
         })
     }
 
-    export async function removeDevice(deviceId: string): Promise<boolean>{
-        return new Promise<boolean>(async resolve=>{
-            try{
+    export async function removeDevice(deviceId: string): Promise<boolean> {
+        return new Promise<boolean>(async resolve => {
+            try {
                 let success = false;
 
                 let client = await getConnection();
@@ -123,17 +128,17 @@ namespace DeviceService {
                 let rentDevicesCollection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
                 let exists = await deviceCollection.findOne({id: deviceId});
                 let isRented = !!(await rentDevicesCollection.findOne({deviceId: deviceId}));
-                if(exists && !isRented) {
-                    if(await RedisHelper.removeDevice(deviceId)) {
+                if (exists && !isRented) {
+                    if (await RedisHelper.removeDevice(deviceId)) {
                         await deviceCollection.deleteOne({id: deviceId});
                         success = true;
-                    }else{
+                    } else {
                         success = false;
                     }
                 }
                 await client.close();
                 resolve(success);
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 resolve(false);
             }
@@ -141,9 +146,9 @@ namespace DeviceService {
     }
 
 
-    export async function addDevice(device: {name: string, company: string, state: number}): Promise<boolean> {
-        return new Promise<boolean>(async resolve=>{
-            try{
+    export async function addDevice(device: { name: string, company: string, state: number }): Promise<boolean> {
+        return new Promise<boolean>(async resolve => {
+            try {
                 let client = await getConnection();
                 let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                 let data: DeviceDTO = {...device, date: new Date().getTime(), id: v4()}
@@ -151,30 +156,36 @@ namespace DeviceService {
                 await client.close();
                 await RedisHelper.addDevice(data);
                 resolve(true);
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 resolve(false);
             }
         })
     }
-    export async function editDevice(device: {id: string, name: string, company: string, state: number}): Promise<boolean>{
-        return new Promise<boolean>(async resolve=>{
+
+    export async function editDevice(device: {
+        id: string,
+        name: string,
+        company: string,
+        state: number
+    }): Promise<boolean> {
+        return new Promise<boolean>(async resolve => {
             let success = false;
-            try{
+            try {
                 let client = await getConnection();
                 let collection = client.db(database.name).collection<DeviceDTO>(database.collections.DevicesCollection);
                 let deviceData = await collection.findOne({id: device.id});
-                if(deviceData) {
-                    if(deviceData.state != DeviceState.Rent){
+                if (deviceData) {
+                    if (deviceData.state != DeviceState.Rent) {
                         let {id: _, ...data} = {...device, date: new Date().getTime()};
                         await collection.updateOne({id: device.id}, {$set: {...data}});
                         await RedisHelper.addDevice({...deviceData, ...data});
                         success = true;
                     }
-                }else success = false;
+                } else success = false;
                 await client.close();
                 resolve(success);
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 resolve(false);
             }

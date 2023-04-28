@@ -34,7 +34,7 @@ let route: RouteController = {
             )
             return
         }
-        if(!(await DeviceService.removeDevice(devId))){
+        if (!(await DeviceService.removeDevice(devId))) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR, "Device not exists or its rented.").toJSON()
             )

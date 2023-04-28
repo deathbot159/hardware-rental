@@ -5,8 +5,8 @@ import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import AccountService from "../Services/AccountService";
 import DeviceService from "../Services/DeviceService";
 import RedisHelper from "../../../Helpers/RedisHelper";
-import returnDevice = DeviceService.returnDevice;
 import {DeviceState} from "../../../Helpers/DeviceState";
+import returnDevice = DeviceService.returnDevice;
 
 
 let route: RouteController = {
@@ -27,13 +27,13 @@ let route: RouteController = {
         }
         let rentDevice = await AccountService.getRentDeviceById(userId, devId);
         let device = await DeviceService.getDevice(devId);
-        if(rentDevice == null || device[0] == null){
+        if (rentDevice == null || device[0] == null) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR, "Cannot find requested device.").toJSON()
             )
             return;
         }
-        if(!(await returnDevice(devId, userId))){
+        if (!(await returnDevice(devId, userId))) {
             res.status(400).send(
                 buildResponse<any>(APIResponseStatus.ERROR, "Cannot return this device.").toJSON()
             )
