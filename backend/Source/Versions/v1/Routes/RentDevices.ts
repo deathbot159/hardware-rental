@@ -9,7 +9,7 @@ let route: RouteController = {
     async handleGet(req, res) {
         let userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
-            res.status(400).send(
+            res.status(401).send(
                 buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return

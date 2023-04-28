@@ -12,14 +12,14 @@ let route: RouteController = {
         let token = req.header("x-access-token");
 
         if (token == undefined) {
-            res.status(400).send(
+            res.status(401).send(
                 buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
         let tokenData = TokenService.untokenize(token);
         if (tokenData.id == "") {
-            res.status(400).send(
+            res.status(401).send(
                 buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
