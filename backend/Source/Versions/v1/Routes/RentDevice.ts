@@ -12,14 +12,14 @@ let route: RouteController = {
         let userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
-                buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
+                buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
         let deviceId = req.params.id;
         if (!deviceId) {
             res.status(400).send(
-                buildResponse<any>(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()
+                buildResponse(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()
             )
             return
         }
@@ -27,7 +27,7 @@ let route: RouteController = {
         if (device[0] != null && !(await DeviceService.isDeviceRent(deviceId as string))) {
             if (!(await rentDevice(deviceId as string, userId))) {
                 res.status(400).send(
-                    buildResponse<any>(APIResponseStatus.ERROR, `Cannot rent device with id ${deviceId}.`).toJSON()
+                    buildResponse(APIResponseStatus.ERROR, `Cannot rent device with id ${deviceId}.`).toJSON()
                 )
                 return;
             }
@@ -37,7 +37,7 @@ let route: RouteController = {
             )
         } else {
             res.status(400).send(
-                buildResponse<any>(APIResponseStatus.ERROR, "Device not exist or is already rent.").toJSON()
+                buildResponse(APIResponseStatus.ERROR, "Device not exist or is already rent.").toJSON()
             )
         }
     }

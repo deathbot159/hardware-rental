@@ -7,7 +7,7 @@ export interface APIResponse<T> {
     data?: T
 }
 
-export class APIResponse<T> {
+export class APIResponse<T=any> {
     constructor(status: APIResponseStatus, message?: string, fromCache?: boolean, data?: T) {
         this.status = status;
         this.message = message;
@@ -25,7 +25,7 @@ export class APIResponse<T> {
     }
 }
 
-const buildResponse = <T>(status: APIResponseStatus, message?: string, fromCache?: boolean, data?: T): APIResponse<T> => {
+const buildResponse = <T=any>(status: APIResponseStatus, message?: string, fromCache?: boolean, data?: T): APIResponse<T> => {
     return new APIResponse<T>(status, message, fromCache, data);
 };
 

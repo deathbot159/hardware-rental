@@ -13,14 +13,14 @@ let route: RouteController = {
 
         if (token == undefined) {
             res.status(401).send(
-                buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
+                buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
         let tokenData = TokenService.untokenize(token);
         if (tokenData.id == "") {
             res.status(401).send(
-                buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
+                buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
@@ -42,7 +42,7 @@ let route: RouteController = {
             )
         } else {
             res.status(404).send(
-                buildResponse<any>(APIResponseStatus.DATA_NOT_FOUND).toJSON()
+                buildResponse(APIResponseStatus.DATA_NOT_FOUND).toJSON()
             )
         }
 

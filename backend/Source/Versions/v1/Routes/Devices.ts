@@ -11,7 +11,7 @@ let route: RouteController = {
         let userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
-                buildResponse<any>(APIResponseStatus.INVALID_TOKEN).toJSON()
+                buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }

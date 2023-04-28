@@ -13,13 +13,13 @@ let route: RouteController = {
 
         if ((!email || !password)) {
             res.status(400).send(
-                buildResponse<any>(APIResponseStatus.INVALID_CREDENTIALS, "Invalid/No data provided.").toJSON()
+                buildResponse(APIResponseStatus.INVALID_CREDENTIALS, "Invalid/No data provided.").toJSON()
             )
             return;
         }
         if (!email.match(/^[a-zA-Z0-9._%+-]+@qarbon\.it$/) || !password.match(/^[0-9a-fA-F]{128}$/)) {
             res.status(400).send(
-                buildResponse<any>(APIResponseStatus.INVALID_CREDENTIALS, "Invalid data provided.").toJSON()
+                buildResponse(APIResponseStatus.INVALID_CREDENTIALS, "Invalid data provided.").toJSON()
             )
             return
         }
@@ -27,19 +27,19 @@ let route: RouteController = {
             default:
             case DatabaseResponseStatus.DB_ERROR:
                 res.status(500).send(
-                    buildResponse<any>(APIResponseStatus.ERROR, "Internal server error.").toJSON()
+                    buildResponse(APIResponseStatus.ERROR, "Internal server error.").toJSON()
                 )
                 return;
             case DatabaseResponseStatus.NO_RESULTS:
                 res.status(400).send(
-                    buildResponse<any>(APIResponseStatus.INVALID_CREDENTIALS, "Invalid credentials provided.").toJSON()
+                    buildResponse(APIResponseStatus.INVALID_CREDENTIALS, "Invalid credentials provided.").toJSON()
                 )
                 return;
             case DatabaseResponseStatus.SUCCESS:
                 let dbResp = await AccountService.GetAccount(email, password);
                 if (dbResp.status == DatabaseResponseStatus.NO_RESULTS || dbResp.status == DatabaseResponseStatus.DB_ERROR) {
                     res.status(500).send(
-                        buildResponse<any>(APIResponseStatus.ERROR, "Internal server error.").toJSON()
+                        buildResponse(APIResponseStatus.ERROR, "Internal server error.").toJSON()
                     )
                     return;
                 }
@@ -50,7 +50,7 @@ let route: RouteController = {
                     )
                 else {
                     res.status(500).send(
-                        buildResponse<any>(APIResponseStatus.ERROR, "Internal server error.").toJSON()
+                        buildResponse(APIResponseStatus.ERROR, "Internal server error.").toJSON()
                     )
                 }
                 return;

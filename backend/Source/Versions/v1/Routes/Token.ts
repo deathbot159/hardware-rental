@@ -8,7 +8,7 @@ let route: RouteController = {
         const {token} = req.body;
         let data = TokenService.untokenize(token);
         res.send(
-            buildResponse<any>(data.id == "" ? APIResponseStatus.INVALID_TOKEN : APIResponseStatus.SUCCESS)
+            buildResponse(data.id == "" ? APIResponseStatus.INVALID_TOKEN : APIResponseStatus.SUCCESS)
         )
     }
 }

@@ -5,7 +5,7 @@ import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 let route: RouteController = {
     handleGet(req, res) {
         res.send(
-            buildResponse<any>(APIResponseStatus.SUCCESS, "Git").toJSON()
+            buildResponse(APIResponseStatus.SUCCESS, "Git").toJSON()
         )
     }
 }
