@@ -2,9 +2,8 @@ import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {IRentDevice, ISessionData, SessionType} from "@/@Types/SessionTypes";
 import {useRouter} from "next/router";
 import {checkToken} from "@/Helpers/Token";
-import axios from "axios";
-import {routes} from "@/Config";
 import {useLoader} from "@/Context/LoaderProvider";
+import API from "@/Helpers/API";
 
 
 export const SessionContext = createContext<SessionType | null>(null);
@@ -36,25 +35,22 @@ export default function SessionProvider({children}: {children: ReactNode}){
                     localStorage.removeItem("token");
                     push("/auth");
                 } else {
-                    axios.get(routes.currentUserInfo, {
-                        headers: {"x-access-token": localStorage.getItem("token")}
-                    }).then(resp => {
-                        if (resp.status == 200) {
-                            let {avatar, name, admin, rentDevices} = resp.data.data;
+                    API.getUserInfo().then(resp=>{
+                        let {success, data} = resp;
+                        if(success){
+                            let {avatar, name, admin, rentDevices} = data!;
                             setSession(prevState => ({
                                 ...prevState,
-                                token: token!,
                                 avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
                                 name: name,
                                 isAdmin: admin
                             }))
                             setRentDevicesState(rentDevices);
+                        }else{
+                            localStorage.removeItem("token");
+                            push("/auth");
                         }
-                    }).catch(() => {
-                        localStorage.removeItem("token");
-                        push("/auth");
                     })
-
                     showLoader(false);
                 }
             }).catch(() => {
@@ -64,34 +60,26 @@ export default function SessionProvider({children}: {children: ReactNode}){
         }
     }, [pathname]);
 
-    const refreshRentDevices = ()=>{
+    const refreshRentDevices = async () => {
         let token = localStorage.getItem("token");
-        if(token == null) {
+        if (token == null) {
             showLoader(true);
             push("/auth");
             return;
         }
-        checkToken(token!).then(valid=>{
-            if (!valid) {
-                localStorage.removeItem("token");
-                push("/auth");
-                return;
-            }
-            axios.get(routes.rentDevices, {
-                "headers": {"x-access-token": token}
-            }).then(resp=>{
-                if(resp.status == 200){
-                    let {data} = resp.data;
-                    setRentDevicesState(data);
-                }else{
-                    localStorage.removeItem("token");
-                    push("/auth")
-                }
-            })
-        }).catch(()=>{
+        let valid = await checkToken(token!);
+        if (!valid) {
+            localStorage.removeItem("token");
+            push("/auth");
+            return;
+        }
+        let {success, data} = await API.getRentDevices();
+        if(success){
+            setRentDevicesState(data!);
+        }else{
             localStorage.removeItem("token");
             push("/auth")
-        })
+        }
     }
 
     const editSession = (sessionData: ISessionData) => {

@@ -2,6 +2,7 @@ import axios from "axios";
 import {routes} from "@/Config";
 import crypto from "crypto";
 import {DeviceState} from "@/Helpers/DeviceState";
+import {IRentDevice, ISessionData} from "@/@Types/SessionTypes";
 
 type APIResponse<T=any> = {
     success: boolean,
@@ -37,6 +38,32 @@ namespace API{
                     resolve({success: false, message: "Unknown error."})
             })
         })
+    }
+
+    export async function getUserInfo(): Promise<APIResponse<any>>{
+        return new Promise<APIResponse<ISessionData>>(resolve => {
+            axios.get(routes.currentUserInfo, {
+                headers: {"x-access-token": localStorage.getItem("token")}
+            }).then(resp => {
+                if (resp.status == 200) {
+                    resolve({success: true, data: resp.data.data});
+                }
+            }).catch(() => {
+                resolve({success: false});
+            })
+        });
+    }
+
+    export async function getRentDevices(): Promise<APIResponse<IRentDevice[]>>{
+        return new Promise<APIResponse<IRentDevice[]>>(resolve => {
+            axios.get(routes.rentDevices, {
+                "headers": {"x-access-token": localStorage.getItem("token")}
+            }).then(resp => {
+                resolve({success: true, data: resp.data.data});
+            }).catch(e=>{
+                resolve({success: false});
+            });
+        });
     }
 
     export async function rentDevice(devId: string): Promise<APIResponse>{

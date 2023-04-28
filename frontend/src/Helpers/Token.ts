@@ -1,5 +1,3 @@
-import axios from "axios";
-import {routes} from "@/Config";
 import API from "@/Helpers/API";
 
 async function checkToken(token: string): Promise<boolean>{
