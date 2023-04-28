@@ -1,6 +1,6 @@
 import '@/Styles/globals.scss'
 import 'bootstrap/dist/css/bootstrap.css'
-import type { AppProps } from 'next/app'
+import type {AppProps} from 'next/app'
 import Head from "next/head";
 import AlertProvider from "@/Context/AlertProvider";
 import LoaderProvider from "@/Context/LoaderProvider";
