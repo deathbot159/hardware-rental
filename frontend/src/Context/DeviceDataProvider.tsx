@@ -45,31 +45,11 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
         }
     }
 
-    const rentDevice = (deviceId: string) => {
-
-    }
-
-    const returnDevice = (deviceId: string) => {
-
-    }
-
-    const editDevice = (deviceId: string) => {
-
-    }
-
-    const removeDevice = (deviceId: string) => {
-
-    }
-
-    const sendDeviceToRepair = (deviceId: string) => {
-
-    }
 
     return (
       <DeviceDataContext.Provider value={
           {
-              devices, loadingDevices, setDevices, refreshData, rentDevice, returnDevice,
-              adminActions: {editDevice, removeDevice, sendDeviceToRepair}
+              devices, loadingDevices, setDevices, refreshData
           }
       }>
           {children}
