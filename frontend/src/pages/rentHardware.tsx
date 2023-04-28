@@ -11,7 +11,7 @@ export default function RentHardware(){
                 <title>Rent hardware - Hardware Rental</title>
             </Head>
             <Layout HeaderText={"Rent hardware"}>
-                <List columnHeadData={columnHead} buttonClickHandler={[()=>{}]}/>
+                <List columnHeadData={columnHead}/>
             </Layout>
         </>
     )

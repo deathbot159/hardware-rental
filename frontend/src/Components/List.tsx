@@ -9,13 +9,12 @@ import {useDeviceData} from "@/Context/DeviceDataProvider";
 import {DeviceState} from "@/Helpers/DeviceState";
 import {useSession} from "@/Context/SessionProvider";
 import {useRouter} from "next/router";
-import axios from "axios";
-import {routes} from "@/Config";
 import {useAlert} from "@/Context/AlertProvider";
+import API from "@/Helpers/API";
 
 type Sorting = {sortByKey: string, sortOrder: "asc"|"desc"}
 
-export default function List({columnHeadData, buttonClickHandler}: {columnHeadData: {key:string, text:string, sortable?: boolean}[], buttonClickHandler: ((elId: string)=>void)[]}){
+export default function List({columnHeadData, buttonClickHandler}: {columnHeadData: {key:string, text:string, sortable?: boolean}[], buttonClickHandler?: ((elId: string)=>void)[]}){
     const {rentDevices, setRentDevices, refreshRentDevices} = useSession();
     const {devices, setDevices, loadingDevices, refreshData} = useDeviceData();
     const {editAlert} = useAlert();
@@ -49,120 +48,75 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
             }))
     }
 
-    const handleRent = (devId: string) => {
-        axios.post(routes.rentDevice(devId), {} ,{
-            "headers": {"x-access-token": localStorage.getItem("token")}
-        }).then(resp=>{
-            if(resp.status == 200){
-                refreshData();
-                editAlert(true, "success", `Successfully rent device ${devices.find(d=>d.id==devId)!.name}.`);
-            }else{
-                if(resp.data.status == 2){
-                    editAlert(true, "danger", "Invalid/deprecated token. Please, log in again.");
-                    localStorage.removeItem("token");
-                    push("/auth")
-                }else{
-                    editAlert(true, "danger", "Cannot rent device.");
-                }
-            }
-        }).catch(()=>{
-            localStorage.removeItem("token")
-            push("/auth")
-        })
-    }
-
-    const handleReturn = (devId: string) => {
-        axios.delete(routes.returnDevice(devId), {
-            headers: {"x-access-token": localStorage.getItem("token")}
-        }).then(resp=>{
-            if(resp.status == 200){
-                refreshData();
-                refreshRentDevices();
-                editAlert(true, "success", `Successfully returned device ${devices.find(d=>d.id==devId)!.name}.`);
-            }else{
-                if(resp.data.status == 2){
-                    editAlert(true, "danger", "Invalid/deprecated token. Please, log in again.");
-                    localStorage.removeItem("token");
-                    push("/auth")
-                }else{
-                    editAlert(true, "danger", "Cannot rent device.");
-                }
-            }
-        }).catch(()=>{
-            localStorage.removeItem("token");
-            push("/auth")
-        })
-    }
-
-    const handleRemove = (devId: string) => {
-        axios.delete(routes.removeDevice(devId), {
-            "headers": {"x-access-token": localStorage.getItem("token")}
-        }).then(()=>{
-            editAlert(true, "success", `Removed device ${devices.find(d=>d.id==devId)!.name}.`);
+    const handleRent = async (devId: string) => {
+        let {success, message} = await API.rentDevice(devId);
+        if(success){
             refreshData();
-        }).catch(e=>{
-            if(e.response) {
-                if (e.response.data.status == 2) {
-                    localStorage.removeItem("token");
-                    editAlert(true, "danger", "Invalid token. Please, log in again.");
-                    push("/auth");
-                    return;
-                }
-                if (e.response.data.status == 4) {
-                    editAlert(true, "warning", "Invalid permissions.");
-                    push("/");
-                    return;
-                }
-                if (e.response.data.status == 6) {
-                    editAlert(true, "danger", "Try again ;)");
-                    return;
-                }
-                if (e.response.data.status == -1) {
-                    editAlert(true, "danger", e.response.data.message);
-                    return;
-                }
-            }else
-                editAlert(true, "danger", "Cannot remove device. API error.");
-        })
+            editAlert(true, "success", `Successfully rent device ${devices.find(d=>d.id==devId)!.name}.`);
+        }else{
+            if(message?.includes("Invalid")){
+                editAlert(true, "danger", message!);
+                localStorage.removeItem("token");
+                push("auth");
+            }else{
+                editAlert(true, "danger", message!);
+            }
+        }
     }
 
-    const handleSendToRepair = (devId: string) => {
-        let device = devices.find(d=>d.id==devId)!;
-        axios.put(routes.editDevice(devId), {
-            "state": device.state == DeviceState.InRepair? DeviceState._: DeviceState.InRepair
-        }, {
-            "headers": {"x-access-token": localStorage.getItem("token")}
-        }).then(()=>{
+    const handleReturn = async (devId: string) => {
+        let {success, message} = await API.returnDevice(devId);
+        if(success){
+            refreshData();
+            refreshRentDevices();
+            editAlert(true, "success", `Successfully returned device ${devices.find(d => d.id == devId)!.name}.`);
+        }else{
+            if(message?.includes("Invalid")){
+                editAlert(true, "danger", message!);
+                localStorage.removeItem("token");
+                push("/auth")
+            }else{
+                editAlert(true, "danger", message!);
+            }
+        }
+    }
+
+    const handleRemove = async (devId: string) => {
+        let {success, message} = await API.removeDevice(devId);
+        if(success){
+            editAlert(true, "success", `Removed device ${devices.find(d => d.id == devId)!.name}.`);
+            refreshData();
+        }else{
+            if(message?.includes("Invalid token")){
+                localStorage.removeItem("token");
+                editAlert(true, "danger", message!);
+                push("/auth");
+            }else if(message?.includes("Invalid permissions")){
+                editAlert(true, "warning", "Invalid permissions.");
+                push("/");
+            }else{
+                editAlert(true, "danger", message!);
+            }
+        }
+    }
+
+    const handleSendToRepair = async (devId: string) => {
+        let device = devices.find(d => d.id == devId)!;
+        let {success, message} = await API.sendDeviceToRepair(devId, device.state);
+        if(success){
             editAlert(true, "success", `Device ${device.name} ${device.state==DeviceState._?"was sent to":"came back from"} repair.`);
             refreshData();
-        }).catch(e=>{
-            if(e.response) {
-                if (e.response.data.status == 2) {
-                    localStorage.removeItem("token");
-                    editAlert(true, "danger", "Invalid token. Please, log in again.");
-                    push("/auth");
-                    return;
-                }
-                if (e.response.data.status == 4) {
-                    editAlert(true, "warning", "Invalid permissions.");
-                    push("/");
-                    return;
-                }
-                if(e.response.data.status == 5){
-                    editAlert(true, "danger", "Invalid request body.");
-                    return;
-                }
-                if (e.response.data.status == 6) {
-                    editAlert(true, "danger", "Try again ;)");
-                    return;
-                }
-                if (e.response.data.status == -1) {
-                    editAlert(true, "danger", e.response.data.message);
-                    return;
-                }
+        }else{
+            if(message?.includes("Invalid token")){
+                localStorage.removeItem("token");
+                editAlert(true, "danger", message!);
+                push("/auth");
+            }else if(message?.includes("Invalid permissions")){
+                editAlert(true, "warning", "Invalid permissions.");
+                push("/");
             }else
-                editAlert(true, "danger", "Cannot send device to repair. API error.");
-        })
+                editAlert(true, "danger", message!);
+        }
     }
 
     return <>
@@ -231,7 +185,7 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
                                     </button>:
                                 key == "acpActions"?
                                     <DropdownButton as={ButtonGroup} title={"Actions"}>
-                                        <DropdownItem eventKey={1} onClick={()=>buttonClickHandler[0](deviceData.id)}>📄 Edit device</DropdownItem>
+                                        <DropdownItem eventKey={1} onClick={()=>buttonClickHandler![0](deviceData.id)}>📄 Edit device</DropdownItem>
                                         <DropdownItem eventKey={2} onClick={()=>handleSendToRepair(deviceData.id)}>🔧 {deviceData.state == DeviceState.InRepair?"Make avilable.":"Send to repair"}</DropdownItem>
                                         <DropdownItem eventKey={3} onClick={()=>handleRemove(deviceData.id)}>❌ Remove device</DropdownItem>
                                     </DropdownButton> :

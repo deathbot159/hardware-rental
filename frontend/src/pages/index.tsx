@@ -11,7 +11,7 @@ export default function HardwareList(){
                 <title>Hardware list - Hardware Rental</title>
             </Head>
             <Layout HeaderText={"Hardware list"}>
-                <List columnHeadData={columnHead} buttonClickHandler={[]}/>
+                <List columnHeadData={columnHead}/>
             </Layout>
         </>
     )
