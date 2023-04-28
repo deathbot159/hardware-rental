@@ -1,10 +1,10 @@
 import alertStyles from "@/Styles/Components/Alert.module.scss"
-import styles from "@/Styles/Pages/Layout.module.scss"
+import styles from "@/Components/Layout/Layout.module.scss"
 import {Alert, Col, Container, Row} from "react-bootstrap";
-import Sidebar from "@/Components/Sidebar";
+import Sidebar from "@/Components/Sidebar/Sidebar";
 import {ReactNode} from "react";
-import Header from "@/Components/Header";
-import Loader from "@/Components/Loader";
+import Header from "@/Components/Layout/Header/Header";
+import Loader from "@/Components/Loader/Loader";
 import {useAlert} from "@/Context/AlertProvider";
 import {useLoader} from "@/Context/LoaderProvider";
 import DeviceDataProvider from "@/Context/DeviceDataProvider";

@@ -1,10 +1,10 @@
-import styles from "@/Styles/Components/Sidebar.module.scss"
-import ButtonStyles from "@/Styles/New/Buttons.module.scss"
+import styles from "@/Components/Sidebar/Sidebar.module.scss"
+import ButtonStyles from "@/Styles/Components/Buttons.module.scss"
 import {Button} from "react-bootstrap";
 import {useRouter} from "next/router";
-import User from "@/Components/Sidebar/User";
-import Menu from "@/Components/Sidebar/Menu";
-import SidebarButton from "@/Components/Sidebar/SidebarButton";
+import User from "@/Components/Sidebar/User/User";
+import Menu from "@/Components/Sidebar/Menu/Menu";
+import SidebarButton from "@/Components/Sidebar/SidebarButton/SidebarButton";
 import {useState} from "react";
 import {useSession} from "@/Context/SessionProvider";
 

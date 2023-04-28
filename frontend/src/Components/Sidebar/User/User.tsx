@@ -1,4 +1,4 @@
-import styles from "@/Styles/Components/Sidebar/User.module.scss";
+import styles from "@/Components/Sidebar/User/User.module.scss";
 import Image from "next/image";
 
 

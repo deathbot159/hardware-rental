@@ -1,6 +1,6 @@
-import styles from "@/Styles/Components/List.module.scss"
-import listStyles from "@/Styles/Components/List.module.scss"
-import ButtonStyles from "@/Styles/New/Buttons.module.scss"
+import styles from "@/Components/List/List.module.scss"
+import listStyles from "@/Components/List/List.module.scss"
+import ButtonStyles from "@/Styles/Components/Buttons.module.scss"
 import moment from "moment/moment";
 import {useState} from "react";
 import {ButtonGroup, DropdownButton} from "react-bootstrap";

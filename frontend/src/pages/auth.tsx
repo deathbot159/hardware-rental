@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import alertStyle from "@/Styles/Components/Alert.module.scss"
-import styles from '@/Styles/Pages/Login.module.scss'
+import styles from '@/Styles/Pages/Auth.module.scss'
 import {Alert, Button, Container, Form} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/router";

@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import styles from "@/Styles/Components/Sidebar/Menu.module.scss"
+import styles from "@/Components/Sidebar/Menu/Menu.module.scss"
 
 export default function Menu({children}: {children: ReactNode}){
     return <>

@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import styles from "@/Styles/Components/Header.module.scss"
+import styles from "@/Components/Layout/Header/Header.module.scss"
 
 export default function Header({children}: {children: ReactNode}){
     return <>

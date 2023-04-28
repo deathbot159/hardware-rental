@@ -1,8 +1,8 @@
 import Head from "next/head";
-import Layout from "@/Components/Layout";
-import acpStyles from "@/Styles/Pages/acp.module.scss"
-import ButtonStyles from "@/Styles/New/Buttons.module.scss"
-import List from "@/Components/List";
+import Layout from "@/Components/Layout/Layout";
+import acpStyles from "@/Styles/Pages/ACP.module.scss"
+import ButtonStyles from "@/Styles/Components/Buttons.module.scss"
+import List from "@/Components/List/List";
 import DeviceModal from "@/Components/ACP/DeviceModal";
 import {useEffect, useState} from "react";
 import {useSession} from "@/Context/SessionProvider";

@@ -1,5 +1,5 @@
 import styles from "@/Styles/Components/Sidebar/SidebarButton.module.scss"
-import ButtonStyles from "@/Styles/New/Buttons.module.scss"
+import ButtonStyles from "@/Styles/Components/Buttons.module.scss"
 import Link from "next/link";
 import {Button} from "react-bootstrap";
 import {ReactNode} from "react";
