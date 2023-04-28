@@ -10,6 +10,18 @@ type APIResponse<T=any> = {
 }
 
 namespace API{
+    export async function checkToken(token: string): Promise<APIResponse>{
+        return new Promise<APIResponse>(resolve => {
+            axios.post(routes.token, {
+                "token": token
+            }).then(()=>{
+                resolve({success: true});
+            }).catch(e=>{
+                resolve({success: false});
+            })
+        })
+    }
+
     export async function authorize(email: string, password: string): Promise<APIResponse<string|null>>{
         return new Promise<APIResponse>(resolve => {
             axios.post(routes.authorize, {

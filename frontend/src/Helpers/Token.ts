@@ -1,15 +1,11 @@
 import axios from "axios";
 import {routes} from "@/Config";
+import API from "@/Helpers/API";
 
 async function checkToken(token: string): Promise<boolean>{
     return new Promise<boolean>(async resolve => {
-        let resp = await axios.post(routes.token, {
-            "token": token
-        });
-        if(resp.status == 200 && resp.data.status == 0)
-            resolve(true);
-        else
-            resolve(false);
+        let {success} = await API.checkToken(token);
+        resolve(success);
     })
 }
 
