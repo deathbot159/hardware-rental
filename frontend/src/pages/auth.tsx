@@ -4,12 +4,12 @@ import styles from '@/Styles/Pages/Login.module.scss'
 import {Alert, Button, Container, Form} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import Loader from "@/Components/Loader";
 import {checkToken} from "@/Helpers/Token";
 import axios from "axios";
 import {routes} from "@/Config";
 import crypto from "crypto";
 import {useAlert} from "@/Context/AlertProvider";
+import API from "@/Helpers/API";
 
 interface Credentials {
     email: string,
@@ -24,22 +24,18 @@ export default function Auth() {
     const [buttonText, setButtonText] = useState("Login");
     const {push} = useRouter();
 
-    let login = ()=>{
-        setCredentials(prev=>({...prev, isLoggingIn: true}));
+    let login = async () => {
+        setCredentials(prev => ({...prev, isLoggingIn: true}));
         setButtonText("Logging in...")
-        axios.post(routes.authorize, {
-            "email": credentials.email,
-            "password": crypto.createHash("sha512").update(credentials.password, "utf-8").digest('hex')
-        }).then(resp=>{
-            if(resp.status == 200 && resp.data.status == 0){
-                localStorage.setItem("token", resp.data.data.token);
-                push("/");
-            }
-        }).catch(e=>{
+        let {success, message, data} = await API.authorize(credentials.email, credentials.password);
+        if(success){
+            localStorage.setItem("token", data!);
+            push("/");
+        }else{
             setCredentials(prev=>({...prev, isLoggingIn: false}));
             setButtonText("Login");
-            editAlert(true, "danger" ,"Invalid email or password provided.");
-        })
+            editAlert(true, "danger" , message||"Error.");
+        }
     }
 
     let checkEmail = (email: string) => {
