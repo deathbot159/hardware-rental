@@ -1,12 +1,5 @@
 {
   "v1": {
-    "/test": {
-      "fileName": "Test",
-      "methods": [
-        "GET"
-      ],
-      "disabled": true
-    },
     "/authorize": {
       "fileName": "Authorize",
       "methods": [
