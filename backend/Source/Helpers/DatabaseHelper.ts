@@ -5,10 +5,6 @@ import AccountDTO from "../DTOs/AccountDTO";
 namespace DatabaseHelper {
     export function getConnection() {
         return MongoClient.connect(`mongodb://${database.host}:${database.port}/${database.name}`, {
-            auth: {
-                username: database.user,
-                password: database.password
-            },
             directConnection: true
         });
     }
