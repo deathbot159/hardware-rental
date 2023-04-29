@@ -23,9 +23,7 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
 
     const refreshData = async () => {
         let token = localStorage.getItem("token");
-        if (token == null) {
-            editAlert(true, "danger", "Nullified token detected. Please log in again.");
-        } else {
+        if (token != null) {
             let {success, data} = await API.getDevices();
             if(success){
                 setDevicesState(
