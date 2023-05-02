@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        working-directory: ./backend
+        cache-dependency-path: ./backend
         cache: 'yarn'
     - name: Install libraries...
       working-directory: ./backend
