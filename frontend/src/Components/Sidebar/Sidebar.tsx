@@ -11,7 +11,7 @@ import {useSession} from "@/Context/SessionProvider";
 export default function Sidebar(){
     const {sessionData} = useSession();
     const [expandClass, setExpandClass] = useState("fi fi-bs-angle-down");
-    const {pathname, push} = useRouter();
+    const {pathname} = useRouter();
 
     const handleLogoff = ()=>{
         localStorage.removeItem("token");
@@ -23,7 +23,7 @@ export default function Sidebar(){
             <div className={styles.topbar}>
                 <Button
                     variant={"outline-info"}
-                    onClick={(ev)=>{
+                    onClick={()=>{
                         let el = document.getElementsByClassName(styles.sidebar)[0];
                         if(el.hasAttribute("visible")) {
                             el.removeAttribute("visible");

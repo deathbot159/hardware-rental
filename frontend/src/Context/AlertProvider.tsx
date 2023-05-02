@@ -12,7 +12,6 @@ export default function AlertProvider({children}: {children: ReactNode}){
             text: ""
         } as IAlert
     );
-    const {pathname} = useRouter();
 
     useEffect(()=>{
         setTimeout(()=>changeAlertVisibility(false), 6000);

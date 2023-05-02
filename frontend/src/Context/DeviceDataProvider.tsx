@@ -29,7 +29,7 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
             return;
         }
         const {success: successU, data: userData} = await API.getUserInfo();
-        if(!(success && userData)){
+        if(!(successU && userData)){
             localStorage.removeItem("token");
             push("/auth");
             return;
