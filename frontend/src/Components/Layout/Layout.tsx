@@ -11,13 +11,13 @@ import DeviceDataProvider from "@/Context/DeviceDataProvider";
 
 
 export default function Layout({children, HeaderText}: {children?: ReactNode, HeaderText: string}){
-    const {loaderSettings} = useLoader();
+    const {visible} = useLoader();
     const {alertOptions, changeAlertVisibility} = useAlert();
 
 
     return(
         <DeviceDataProvider>
-            <Loader visible={loaderSettings.visible}>&quot;&quot;</Loader>
+            <Loader visible={visible}>&quot;&quot;</Loader>
             <Container fluid className={styles.dashboard}>
                 <Row>
                     <Col className={styles.leftCol} lg={2}>
