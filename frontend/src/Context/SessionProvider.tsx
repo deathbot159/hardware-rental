@@ -14,7 +14,8 @@ export default function SessionProvider({children}: {children: ReactNode}){
         {
             avatarLink: "/avatars/default.png",
             name: "Loading...",
-            isAdmin: false
+            isAdmin: false,
+            fetching: true
         } as ISessionData
     )
     const [rentDevices, setRentDevicesState] = useState([] as IRentDevice[]);
@@ -25,7 +26,7 @@ export default function SessionProvider({children}: {children: ReactNode}){
         let token = localStorage.getItem("token");
 
         if(pathname == "/auth"){
-            setSession({avatarLink: "/avatars/default.png", name:"Loading...", isAdmin: false});
+            setSession({avatarLink: "/avatars/default.png", name:"Loading...", isAdmin: false, fetching: false});
             return;
         }
 
@@ -47,7 +48,8 @@ export default function SessionProvider({children}: {children: ReactNode}){
                         setSession({
                             avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
                             name: name,
-                            isAdmin: admin
+                            isAdmin: admin,
+                            fetching: false
                         })
                         setRentDevicesState(rentDevices);
                         showLoader(false);
