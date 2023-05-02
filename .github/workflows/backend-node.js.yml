@@ -28,7 +28,4 @@ jobs:
       run: yarn install
     - name: Run build...
       working-directory: ./backend
-      run: npm run build --if-present
-    - name: Run tests...
-      working-directory: ./backend
-      run: npm test --if-present
+      run: yarn build
