@@ -23,39 +23,43 @@ export default function SessionProvider({children}: {children: ReactNode}){
 
     useEffect(()=>{
         let token = localStorage.getItem("token");
+
         if(pathname == "/auth"){
             setSession({avatarLink: "/avatars/default.png", name:"Loading...", isAdmin: false});
-        }else {
-            if(token == null) {
-                showLoader(true);
-                push("/auth");
-            }
-            checkToken(token!).then(valid => {
+            return;
+        }
+
+        if(token == null && pathname != "/auth"){
+            showLoader(true);
+            push("/auth");
+            return;
+        }
+
+        if(pathname != "/auth"){
+            checkToken(token!).then(async valid => {
                 if (!valid) {
                     localStorage.removeItem("token");
                     push("/auth");
                 } else {
-                    API.getUserInfo().then(resp=>{
-                        let {success, data} = resp;
-                        if(success){
-                            let {avatar, name, admin, rentDevices} = data!;
-                            setSession(prevState => ({
-                                ...prevState,
-                                avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
-                                name: name,
-                                isAdmin: admin
-                            }))
-                            setRentDevicesState(rentDevices);
-                        }else{
-                            localStorage.removeItem("token");
-                            push("/auth");
-                        }
-                    })
-                    showLoader(false);
+                    let {success, data} = await API.getUserInfo();
+                    if(success){
+                        let {avatar, name, admin, rentDevices} = data!;
+                        setSession({
+                            avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
+                            name: name,
+                            isAdmin: admin
+                        })
+                        setRentDevicesState(rentDevices);
+                        showLoader(false);
+                    }else{
+                        localStorage.removeItem("token");
+                        await push("/auth");
+                    }
                 }
             }).catch(() => {
                 localStorage.removeItem("token");
                 push("/auth")
+                return;
             })
         }
     }, [pathname]);
