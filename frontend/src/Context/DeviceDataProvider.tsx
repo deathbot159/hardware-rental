@@ -23,9 +23,9 @@ export default function DeviceDataProvider({children}: {children: ReactNode}){
         let token = localStorage.getItem("token");
         if(token == null) return;
         let {success, data} = await API.getDevices();
-        if(success){
+        if(success && data){
             setDevicesState(
-                data!.map(d => ({
+                data.map(d => ({
                     ...d,
                     name: `${d.company} ${d.name}`,
                     availability: !sessionData.isAdmin ? d.state != 0 ? DeviceState.NotAvilable : DeviceState._ : d.state
