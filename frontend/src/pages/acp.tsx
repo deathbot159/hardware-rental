@@ -20,7 +20,7 @@ export default function AdminControlPanel(){
     const {push} = useRouter();
 
     useEffect(()=>{
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         checkToken(token!).then(async valid=>{
             if(!valid) {
                 localStorage.removeItem("token");
@@ -35,7 +35,7 @@ export default function AdminControlPanel(){
                 push("/");
                 return;
             }
-            let {success, data} = await API.getUserInfo();
+            const {success, data} = await API.getUserInfo();
             if(!success){
                 localStorage.removeItem("token");
                 push("/auth");
@@ -65,7 +65,7 @@ export default function AdminControlPanel(){
 
     return(
         <>
-            {!sessionData.isAdmin|| <>
+            {(sessionData.fetching || !sessionData.isAdmin) || <>
                 <Head>
                     <title>Admin Control Panel - Hardware Rental</title>
                 </Head>

@@ -13,7 +13,7 @@ export default function Sidebar(){
     const [expandClass, setExpandClass] = useState("fi fi-bs-angle-down");
     const {pathname, push} = useRouter();
 
-    const handleLogoff = async ()=>{
+    const handleLogoff = ()=>{
         localStorage.removeItem("token");
         window.location.replace("/auth")
     }

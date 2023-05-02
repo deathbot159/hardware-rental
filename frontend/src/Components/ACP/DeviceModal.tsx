@@ -16,7 +16,7 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
 
     useEffect(()=>{
         if(deviceId != "") {
-            let device = devices.find(d => d.id == deviceId)!;
+            const device = devices.find(d => d.id == deviceId)!;
             setDeviceData({
                 name: device.name,
                 company: device.company,
@@ -41,13 +41,13 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
     const handleAdd = async () => {
         if (deviceData.tryingToExecute) return;
         toggleButtons();
-        let {name, company} = deviceData;
+        const {name, company} = deviceData;
         if (name == "" || company == "") {
             editAlert(true, "warning", "Please, provide name and company of device.");
             toggleButtons()
             return;
         }
-        let {success, message} = await API.addDevice(deviceData);
+        const {success, message} = await API.addDevice(deviceData);
         if(success){
             refreshData();
             editAlert(true, "success", `Successfully added device ${company} ${name}`);
@@ -56,9 +56,11 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
                 localStorage.removeItem("token");
                 editAlert(true, "danger", message!);
                 push("/auth");
+                return;
             }else if(message?.includes("Invalid permissions")){
                 editAlert(true, "warning", message!);
                 push("/");
+                return;
             }else{
                 editAlert(true, "danger", message!)
             }
@@ -69,14 +71,14 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
     const handleEdit = async (devId: string) => {
         if (deviceData.tryingToExecute) return;
         toggleButtons();
-        let originalData = devices.find(d => d.id == devId)!;
-        let {name, company, state} = deviceData;
+        const originalData = devices.find(d => d.id == devId)!;
+        const {name, company, state} = deviceData;
         if (name == "" || company == "") {
             editAlert(true, "warning", "Please, provide name and company of device.");
             toggleButtons()
             return;
         }
-        let {success, message} = await API.editDevice(devId,
+        const {success, message} = await API.editDevice(devId,
             {
                 name: name == originalData.name ? name.replace(originalData.company + " ", "") : name,
                 company: company,
@@ -90,9 +92,11 @@ export default function DeviceModal({showModal, setShowModal, modalType, setDevi
                 localStorage.removeItem("token");
                 editAlert(true, "danger", message!);
                 push("/auth");
+                return;
             }else if(message?.includes("Invalid permissions")){
                 editAlert(true, "warning", message!);
                 push("/");
+                return;
             }else{
                 editAlert(true, "danger", message!)
             }

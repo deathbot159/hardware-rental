@@ -18,7 +18,7 @@ export default function Auth() {
     const login = async () => {
         setCredentials(prev => ({...prev, isLoggingIn: true}));
         setButtonText("Logging in...")
-        let {success, message, data} = await API.authorize(credentials.email, credentials.password);
+        const {success, message, data} = await API.authorize(credentials.email, credentials.password);
         if (!success || !data) {
             setCredentials(prev => ({...prev, isLoggingIn: false}));
             setButtonText("Login");
@@ -46,7 +46,7 @@ export default function Auth() {
     }
 
     useEffect(() => {
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         if (token == null) return;
         setButtonText("Checking token...");
         setCredentials(prev=>({...prev, isLoggingIn: true}))

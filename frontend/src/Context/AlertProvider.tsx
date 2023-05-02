@@ -18,10 +18,6 @@ export default function AlertProvider({children}: {children: ReactNode}){
         setTimeout(()=>changeAlertVisibility(false), 6000);
     }, [alertOptions.show]);
 
-    useEffect(()=>{
-        changeAlertVisibility(false);
-    }, [pathname])
-
     const changeAlertVisibility = (visibility: boolean) => {
         setAlertOptions(prev=>({...prev, show: visibility}));
     };

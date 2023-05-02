@@ -6,18 +6,15 @@ import {ReactNode} from "react";
 import Header from "@/Components/Layout/Header/Header";
 import Loader from "@/Components/Loader/Loader";
 import {useAlert} from "@/Context/AlertProvider";
-import {useLoader} from "@/Context/LoaderProvider";
 import DeviceDataProvider from "@/Context/DeviceDataProvider";
 
 
 export default function Layout({children, HeaderText}: {children?: ReactNode, HeaderText: string}){
-    const {visible} = useLoader();
     const {alertOptions, changeAlertVisibility} = useAlert();
-
 
     return(
         <DeviceDataProvider>
-            <Loader visible={visible}>&quot;&quot;</Loader>
+            <Loader/>
             <Container fluid className={styles.dashboard}>
                 <Row>
                     <Col className={styles.leftCol} lg={2}>

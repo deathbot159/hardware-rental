@@ -23,7 +23,7 @@ export default function SessionProvider({children}: {children: ReactNode}){
     const {push, pathname} = useRouter();
 
     useEffect(()=>{
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
         if(pathname == "/auth"){
             setSession({avatarLink: "/avatars/default.png", name:"Loading...", isAdmin: false, fetching: false});
@@ -42,9 +42,9 @@ export default function SessionProvider({children}: {children: ReactNode}){
                     localStorage.removeItem("token");
                     push("/auth");
                 } else {
-                    let {success, data} = await API.getUserInfo();
+                    const {success, data} = await API.getUserInfo();
                     if(success){
-                        let {avatar, name, admin, rentDevices} = data!;
+                        const {avatar, name, admin, rentDevices} = data!;
                         setSession({
                             avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
                             name: name,
@@ -67,19 +67,19 @@ export default function SessionProvider({children}: {children: ReactNode}){
     }, [pathname]);
 
     const refreshRentDevices = async () => {
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         if (token == null) {
             showLoader(true);
             push("/auth");
             return;
         }
-        let valid = await checkToken(token!);
+        const valid = await checkToken(token!);
         if (!valid) {
             localStorage.removeItem("token");
             push("/auth");
             return;
         }
-        let {success, data} = await API.getRentDevices();
+        const {success, data} = await API.getRentDevices();
         if(success){
             setRentDevicesState(data!);
         }else{
