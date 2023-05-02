@@ -14,7 +14,8 @@ export default function SessionProvider({children}: {children: ReactNode}){
         {
             avatarLink: "/avatars/default.png",
             name: "Loading...",
-            isAdmin: false
+            isAdmin: false,
+            fetching: true
         } as ISessionData
     )
     const [rentDevices, setRentDevicesState] = useState([] as IRentDevice[]);
@@ -22,58 +23,63 @@ export default function SessionProvider({children}: {children: ReactNode}){
     const {push, pathname} = useRouter();
 
     useEffect(()=>{
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
+
         if(pathname == "/auth"){
-            setSession({avatarLink: "/avatars/default.png", name:"Loading...", isAdmin: false});
-        }else {
-            if(token == null) {
-                showLoader(true);
-                push("/auth");
-            }
-            checkToken(token!).then(valid => {
+            setSession({avatarLink: "/avatars/default.png", name:"Loading...", isAdmin: false, fetching: false});
+            return;
+        }
+
+        if(token == null && pathname != "/auth"){
+            showLoader(true);
+            push("/auth");
+            return;
+        }
+
+        if(pathname != "/auth"){
+            checkToken(token!).then(async valid => {
                 if (!valid) {
                     localStorage.removeItem("token");
                     push("/auth");
                 } else {
-                    API.getUserInfo().then(resp=>{
-                        let {success, data} = resp;
-                        if(success){
-                            let {avatar, name, admin, rentDevices} = data!;
-                            setSession(prevState => ({
-                                ...prevState,
-                                avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
-                                name: name,
-                                isAdmin: admin
-                            }))
-                            setRentDevicesState(rentDevices);
-                        }else{
-                            localStorage.removeItem("token");
-                            push("/auth");
-                        }
-                    })
-                    showLoader(false);
+                    const {success, data} = await API.getUserInfo();
+                    if(success){
+                        const {avatar, name, admin, rentDevices} = data!;
+                        setSession({
+                            avatarLink: `/avatars/${avatar == "" ? "default.png" : avatar}`,
+                            name: name,
+                            isAdmin: admin,
+                            fetching: false
+                        })
+                        setRentDevicesState(rentDevices);
+                        showLoader(false);
+                    }else{
+                        localStorage.removeItem("token");
+                        await push("/auth");
+                    }
                 }
             }).catch(() => {
                 localStorage.removeItem("token");
                 push("/auth")
+                return;
             })
         }
     }, [pathname]);
 
     const refreshRentDevices = async () => {
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         if (token == null) {
             showLoader(true);
             push("/auth");
             return;
         }
-        let valid = await checkToken(token!);
+        const valid = await checkToken(token!);
         if (!valid) {
             localStorage.removeItem("token");
             push("/auth");
             return;
         }
-        let {success, data} = await API.getRentDevices();
+        const {success, data} = await API.getRentDevices();
         if(success){
             setRentDevicesState(data!);
         }else{

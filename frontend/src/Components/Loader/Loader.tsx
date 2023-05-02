@@ -1,6 +1,7 @@
 import styles from "@/Components/Loader/Loader.module.scss"
-import {ReactNode} from "react";
+import {useLoader} from "@/Context/LoaderProvider";
 
-export default function Loader({children, visible}: {children: ReactNode, visible: boolean}){
-    return <div className={`${styles.loader} ${!visible? styles.hide: ""}`}>{children}</div>
+export default function Loader(){
+    const {visible} = useLoader();
+    return <div className={`${styles.loader} ${!visible? styles.hide: ""}`}>&quot;&quot;</div>
 }

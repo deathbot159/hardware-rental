@@ -9,8 +9,7 @@ import {useSession} from "@/Context/SessionProvider";
 import {checkToken} from "@/Helpers/Token";
 import {useRouter} from "next/router";
 import {useAlert} from "@/Context/AlertProvider";
-import axios from "axios";
-import {routes} from "@/Config";
+import API from "@/Helpers/API";
 
 export default function AdminControlPanel(){
     const {sessionData} = useSession();
@@ -21,35 +20,37 @@ export default function AdminControlPanel(){
     const {push} = useRouter();
 
     useEffect(()=>{
-        let token = localStorage.getItem("token");
-        checkToken(token!).then(valid=>{
-            if(!valid){
+        const token = localStorage.getItem("token");
+        checkToken(token!).then(async valid=>{
+            if(!valid) {
                 localStorage.removeItem("token");
                 push("/auth")
-                return
+                return;
             }
+
+            if(sessionData.fetching) return;
+
             if(!sessionData.isAdmin){
                 editAlert(true, "warning", "Invalid permissions.");
-                push("/")
-                return
+                push("/");
+                return;
             }
-            axios.get(routes.currentUserInfo, {
-                "headers": {"x-access-token": token}
-            }).then(resp=>{
-                let {admin}: {admin: boolean} = resp.data.data;
-                if(!admin){
-                    editAlert(true, "warning", "Invalid permissions.");
-                    push("/")
-                }
-            }).catch(()=>{
+            const {success, data} = await API.getUserInfo();
+            if(!success){
                 localStorage.removeItem("token");
-                push("/auth")
-            })
+                push("/auth");
+                return;
+            }
+
+            if(!data.admin){
+                editAlert(true, "warning", "Invalid permissions.");
+                await push("/")
+            }
         }).catch(()=>{
             localStorage.removeItem("token");
             push("/auth")
         })
-    }, [])
+    }, [sessionData.fetching])
 
 
     const showEditModal = (devId: string) =>{
@@ -64,7 +65,7 @@ export default function AdminControlPanel(){
 
     return(
         <>
-            {!sessionData.isAdmin|| <>
+            {(sessionData.fetching || !sessionData.isAdmin) || <>
                 <Head>
                     <title>Admin Control Panel - Hardware Rental</title>
                 </Head>

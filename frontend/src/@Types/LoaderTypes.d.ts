@@ -1,8 +1,4 @@
-export interface ILoader {
-    visible: boolean;
-}
-
 export type LoaderType = {
-    loaderSettings: ILoader;
+    visible: boolean,
     showLoader: (visible: boolean) => void;
 }

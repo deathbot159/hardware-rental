@@ -3,7 +3,7 @@ import Layout from "@/Components/Layout/Layout";
 import List from "@/Components/List/List";
 
 export default function RentHardware(){
-    let columnHead = [{key: "name", text: "Name & Company", sortable: true}, {key: "date", text:"Date", sortable: true}, {key: "returnBtn", text: "Return"}];
+    const columnHead = [{key: "name", text: "Name & Company", sortable: true}, {key: "date", text:"Date", sortable: true}, {key: "returnBtn", text: "Return"}];
 
     return(
         <>

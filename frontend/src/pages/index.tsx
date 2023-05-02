@@ -3,7 +3,7 @@ import Layout from "@/Components/Layout/Layout";
 import List from "@/Components/List/List";
 
 export default function HardwareList(){
-    let columnHead = [{key: "name", text: "Name & Company", sortable: true}, {key: "date", text:"Date", sortable: true}, {key: "availability", text: "Availability", sortable: true}, {key: "rentBtn", text: "Rent"}];
+    const columnHead = [{key: "name", text: "Name & Company", sortable: true}, {key: "date", text:"Date", sortable: true}, {key: "availability", text: "Availability", sortable: true}, {key: "rentBtn", text: "Rent"}];
 
     return(
         <>
