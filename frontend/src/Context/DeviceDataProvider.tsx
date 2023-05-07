@@ -1,7 +1,6 @@
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {DeviceDataType, IDevice} from "@/@Types/DeviceDataTypes";
 import {useSession} from "@/Context/SessionProvider";
-import {useAlert} from "@/Context/AlertProvider";
 import {useRouter} from "next/router";
 import {DeviceState} from "@/Helpers/DeviceState";
 import API from "@/Helpers/API";
@@ -10,36 +9,40 @@ export const DeviceDataContext = createContext<DeviceDataType | null>(null);
 
 export default function DeviceDataProvider({children}: {children: ReactNode}){
     const {sessionData} = useSession();
-    const {editAlert} = useAlert();
     const [devices, setDevicesState] = useState([] as IDevice[]);
     const [loadingDevices, setLoadingDevices] = useState(true);
     const {push} = useRouter();
 
-    useEffect(()=> {refreshData()}, [sessionData]);
+    useEffect(()=> {refreshData()}, [sessionData.fetching]);
 
     const setDevices = (devices: IDevice[]) => {
         setDevicesState(devices);
     }
 
     const refreshData = async () => {
-        let token = localStorage.getItem("token");
-        if (token != null) {
-            let {success, data} = await API.getDevices();
-            if(success){
-                setDevicesState(
-                    data!.map(d => ({
-                        ...d,
-                        name: `${d.company} ${d.name}`,
-                        availability: !sessionData.isAdmin ? d.state != 0 ? DeviceState.NotAvilable : DeviceState._ : d.state
-                    }))
-                        .sort((a, b) => (a.name < b.name) ? -1 : 1)
-                );
-                setLoadingDevices(false);
-            }else{
-                localStorage.removeItem("token");
-                push("/auth");
-            }
+        const token = localStorage.getItem("token");
+        if(token == null) return;
+        const {success, data: devicesData} = await API.getDevices();
+        if (!(success && devicesData)) {
+            localStorage.removeItem("token");
+            push("/auth");
+            return;
         }
+        const {success: successU, data: userData} = await API.getUserInfo();
+        if(!(successU && userData)){
+            localStorage.removeItem("token");
+            push("/auth");
+            return;
+        }
+        setDevicesState(
+            devicesData.map(d => ({
+                ...d,
+                name: `${d.company} ${d.name}`,
+                availability: !userData.admin ? d.state != 0 ? DeviceState.NotAvilable : DeviceState._ : d.state
+            }))
+                .sort((a, b) => (a.name < b.name) ? -1 : 1)
+        );
+        setLoadingDevices(false);
     }
 
 

@@ -1,5 +1,6 @@
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {AlertOptionsType, AlertVariants, IAlert} from "@/@Types/AlertOptionsTypes";
+import {useRouter} from "next/router";
 
 export const AlertContext = createContext<AlertOptionsType | null>(null);
 
@@ -13,9 +14,7 @@ export default function AlertProvider({children}: {children: ReactNode}){
     );
 
     useEffect(()=>{
-        setTimeout(()=>{
-            setAlertOptions(prev=>({...prev, show: false}));
-        }, 6000);
+        setTimeout(()=>changeAlertVisibility(false), 6000);
     }, [alertOptions.show]);
 
     const changeAlertVisibility = (visibility: boolean) => {

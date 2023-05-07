@@ -7,52 +7,58 @@ import {useRouter} from "next/router";
 import {checkToken} from "@/Helpers/Token";
 import {useAlert} from "@/Context/AlertProvider";
 import API from "@/Helpers/API";
-
-interface Credentials {
-    email: string,
-    password: string,
-    isValid: boolean,
-    isLoggingIn: boolean
-}
+import {IAuthCredentials} from "@/@Types/AuthTypes";
 
 export default function Auth() {
     const {alertOptions, editAlert, changeAlertVisibility} = useAlert();
-    const [credentials, setCredentials] = useState({email: "", password:"", isValid: true, isLoggingIn: false} as Credentials);
+    const [credentials, setCredentials] = useState({email: "", password:"", isValid: true, isLoggingIn: false} as IAuthCredentials);
     const [buttonText, setButtonText] = useState("Login");
     const {push} = useRouter();
 
-    let login = async () => {
+    const login = async () => {
         setCredentials(prev => ({...prev, isLoggingIn: true}));
         setButtonText("Logging in...")
-        let {success, message, data} = await API.authorize(credentials.email, credentials.password);
-        if(success){
-            localStorage.setItem("token", data!);
-            push("/");
-        }else{
-            setCredentials(prev=>({...prev, isLoggingIn: false}));
+        const {success, message, data} = await API.authorize(credentials.email, credentials.password);
+        if (!success || !data) {
+            setCredentials(prev => ({...prev, isLoggingIn: false}));
             setButtonText("Login");
-            editAlert(true, "danger" , message||"Error.");
+            editAlert(true, "danger", message || "Error.");
+            return;
         }
+        localStorage.setItem("token", data!);
+        push("/");
     }
 
-    let checkEmail = (email: string) => {
+    const checkEmail = (email: string) => {
         return email == "" || !!email.match(/^[a-zA-Z0-9._%+-]+@qarbon\.it$/);
     }
 
-    useEffect(() => {
-        let token = localStorage.getItem("token");
-        if (token != null) {
-            setButtonText("Checking token...");
-            setCredentials(prev=>({...prev, isLoggingIn: true}))
-            checkToken(token).then(valid=>{
-                if(valid) push("/")
-                else {
-                    localStorage.removeItem("token");
-                    setButtonText("Login");
-                    editAlert(true, "warning" ,"Your session is expired. Please, log in.");
-                }
-            })
+    const handleEnter = (ev: any) => {
+        if(ev.key=="Enter") login();
+    }
+
+    const handleInput = (field: "email"|"password", value: string) => {
+        if(field == "email"){
+            setCredentials((prev)=>({...prev, email: value, isValid: checkEmail(value)}))
+            return;
         }
+        setCredentials((prev)=>({...prev, password: value}))
+    }
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token == null) return;
+        setButtonText("Checking token...");
+        setCredentials(prev=>({...prev, isLoggingIn: true}))
+        checkToken(token).then(valid=>{
+            if (!valid) {
+                localStorage.removeItem("token");
+                setButtonText("Login");
+                editAlert(true, "warning", "Your session is expired. Please, log in.");
+                return;
+            }
+            push("/");
+        })
     }, [])
 
     return (
@@ -60,21 +66,17 @@ export default function Auth() {
             <Head>
                 <title>Login - Hardware Rental</title>
             </Head>
-            <Container fluid className={`${styles.login__box} vh-100 d-flex gap-5 flex-column align-items-center justify-content-center`}>
+            <Container fluid className={`${styles.login__box} vh-100 d-flex gap-5 flex-column align-items-center justify-content-center`} onKeyDown={handleEnter}>
                 <h1>Welcome back 👋</h1>
                 <Form.Group controlId={"formEmail"}>
                     <Form.Label>Email</Form.Label>
                     <Form.Control className={`${!credentials.isValid?styles.invalid_input:""} rounded-`} disabled={credentials.isLoggingIn} type={"email"}
-                                  onChange={(ev)=>
-                                      setCredentials((prev)=>({...prev, email: ev.target.value, isValid: checkEmail(ev.target.value)}))
-                                  }/>
+                                  onChange={(ev)=>handleInput("email", ev.target.value)}/>
                     <Form.Label className={`${styles.info_label} ${!credentials.isValid?styles.invalid_label:""}`}><i className={"fi fi-rs-exclamation"}></i> Invalid email provided.</Form.Label>
                 </Form.Group>
                 <Form.Group controlId={"formPassword"}>
                     <Form.Label>Password</Form.Label>
-                    <Form.Control type={"password"} disabled={credentials.isLoggingIn} onKeyDown={(ev)=>{if(ev.key=="Enter")login();}} onChange={(ev)=>
-                        setCredentials((prev)=>({...prev, password: ev.target.value}))
-                    } />
+                    <Form.Control type={"password"} disabled={credentials.isLoggingIn} onChange={(ev)=>handleInput("password", ev.target.value)} />
                 </Form.Group>
                 <Button type={"submit"} variant={credentials.isLoggingIn? "warning": "primary"} disabled={credentials.isLoggingIn} onClick={login}>
                     {buttonText}

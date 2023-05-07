@@ -1,9 +1,7 @@
-enum DeviceState{
+export enum DeviceState{
     _,
     Rent,
     Disabled,
     InRepair,
     NotAvilable
 }
-
-export {DeviceState};

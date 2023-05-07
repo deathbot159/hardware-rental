@@ -49,74 +49,74 @@ export default function List({columnHeadData, buttonClickHandler}: {columnHeadDa
     }
 
     const handleRent = async (devId: string) => {
-        let {success, message} = await API.rentDevice(devId);
-        if(success){
-            refreshData();
-            editAlert(true, "success", `Successfully rent device ${devices.find(d=>d.id==devId)!.name}.`);
-        }else{
-            if(message?.includes("Invalid")){
-                editAlert(true, "danger", message!);
+        const {success, message} = await API.rentDevice(devId);
+        if (!success && message) {
+            if (message.includes("Invalid")) {
+                editAlert(true, "danger", message);
                 localStorage.removeItem("token");
                 push("auth");
-            }else{
-                editAlert(true, "danger", message!);
+            } else {
+                editAlert(true, "danger", message);
             }
+            return;
         }
+        refreshData();
+        editAlert(true, "success", `Successfully rent device ${devices.find(d => d.id == devId)!.name}.`);
     }
 
     const handleReturn = async (devId: string) => {
-        let {success, message} = await API.returnDevice(devId);
-        if(success){
-            refreshData();
-            refreshRentDevices();
-            editAlert(true, "success", `Successfully returned device ${devices.find(d => d.id == devId)!.name}.`);
-        }else{
-            if(message?.includes("Invalid")){
-                editAlert(true, "danger", message!);
+        const {success, message} = await API.returnDevice(devId);
+        if (!success && message) {
+            if (message.includes("Invalid")) {
+                editAlert(true, "danger", message);
                 localStorage.removeItem("token");
                 push("/auth")
-            }else{
-                editAlert(true, "danger", message!);
+            } else {
+                editAlert(true, "danger", message);
             }
+            return;
         }
+        refreshData();
+        refreshRentDevices();
+        editAlert(true, "success", `Successfully returned device ${devices.find(d => d.id == devId)!.name}.`);
     }
 
     const handleRemove = async (devId: string) => {
-        let {success, message} = await API.removeDevice(devId);
-        if(success){
-            editAlert(true, "success", `Removed device ${devices.find(d => d.id == devId)!.name}.`);
-            refreshData();
-        }else{
-            if(message?.includes("Invalid token")){
+        const {success, message} = await API.removeDevice(devId);
+        if (!success && message) {
+            if (message.includes("Invalid token")) {
                 localStorage.removeItem("token");
-                editAlert(true, "danger", message!);
+                editAlert(true, "danger", message);
                 push("/auth");
-            }else if(message?.includes("Invalid permissions")){
+            } else if (message?.includes("Invalid permissions")) {
                 editAlert(true, "warning", "Invalid permissions.");
                 push("/");
-            }else{
-                editAlert(true, "danger", message!);
+            } else {
+                editAlert(true, "danger", message);
             }
+            return;
         }
+        editAlert(true, "success", `Removed device ${devices.find(d => d.id == devId)!.name}.`);
+        refreshData();
     }
 
     const handleSendToRepair = async (devId: string) => {
-        let device = devices.find(d => d.id == devId)!;
-        let {success, message} = await API.sendDeviceToRepair(devId, device.state);
-        if(success){
-            editAlert(true, "success", `Device ${device.name} ${device.state==DeviceState._?"was sent to":"came back from"} repair.`);
-            refreshData();
-        }else{
-            if(message?.includes("Invalid token")){
+        const device = devices.find(d => d.id == devId)!;
+        const {success, message} = await API.sendDeviceToRepair(devId, device.state);
+        if (!success && message) {
+            if (message.includes("Invalid token")) {
                 localStorage.removeItem("token");
-                editAlert(true, "danger", message!);
+                editAlert(true, "danger", message);
                 push("/auth");
-            }else if(message?.includes("Invalid permissions")){
+            } else if (message?.includes("Invalid permissions")) {
                 editAlert(true, "warning", "Invalid permissions.");
                 push("/");
-            }else
-                editAlert(true, "danger", message!);
+            } else
+                editAlert(true, "danger", message);
+            return;
         }
+        editAlert(true, "success", `Device ${device.name} ${device.state == DeviceState._ ? "was sent to" : "came back from"} repair.`);
+        refreshData();
     }
 
     return <>

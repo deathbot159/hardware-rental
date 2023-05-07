@@ -8,6 +8,7 @@ export interface ISessionData {
     avatarLink: string;
     name: string;
     isAdmin: boolean;
+    fetching: boolean;
 }
 
 export type SessionType = {
