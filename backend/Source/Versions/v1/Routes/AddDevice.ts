@@ -9,14 +9,14 @@ import {DeviceState} from "../../../Helpers/DeviceState";
 
 let route: RouteController = {
     async handlePost(req, res) {
-        let userId = RouteService.checkToken(req.header("x-access-token"));
+        const userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
-        let accResp = await AccountService.GetAccountById(userId);
+        const accResp = await AccountService.GetAccountById(userId);
         if (accResp.data.id == undefined) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
@@ -29,7 +29,7 @@ let route: RouteController = {
             )
             return
         }
-        let {name, company, disabled} = req.body;
+        const {name, company, disabled} = req.body;
         if (name == undefined || company == undefined || disabled == undefined) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.INVALID_REQUEST_BODY).toJSON()

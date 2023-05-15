@@ -1,5 +1,5 @@
 import AccountDTO from "../../../DTOs/AccountDTO";
-import {database} from "../../../Config.json"
+import cfg from "../../../Config"
 import {DatabaseResponse, DatabaseResponseStatus} from "../../../Helpers/DatabaseResponse";
 import RedisHelper from "../../../Helpers/RedisHelper";
 import DatabaseHelper from "../../../Helpers/DatabaseHelper";
@@ -14,7 +14,7 @@ namespace AccountService {
             try {
                 let found = false;
                 let fromCache = false;
-                let cacheData = await RedisHelper.getAccount(email);
+                const cacheData = await RedisHelper.getAccount(email);
 
                 if (cacheData != undefined) {
                     if ((cacheData as AccountDTO).password == password) {
@@ -22,9 +22,9 @@ namespace AccountService {
                         fromCache = true;
                     }
                 } else {
-                    let client = await getConnection();
-                    let collection = client.db(database.name).collection<AccountDTO>(database.collections.AccountsCollection);
-                    let result = await collection.findOne({email: email, password: password})
+                    const client = await getConnection();
+                    const collection = client.db(cfg.database.name).collection<AccountDTO>(cfg.database.collections.AccountsCollection);
+                    const result = await collection.findOne({email: email, password: password})
                     await client.close()
                     found = result != null;
                 }
@@ -45,7 +45,7 @@ namespace AccountService {
                 let found = false;
                 let fromCache = false;
                 let data = {};
-                let cacheData = await RedisHelper.getAccount(email);
+                const cacheData = await RedisHelper.getAccount(email);
 
                 if (cacheData != undefined) {
                     if ((cacheData as AccountDTO).password == password) {
@@ -54,9 +54,9 @@ namespace AccountService {
                         data = cacheData as AccountDTO;
                     }
                 } else {
-                    let client = await getConnection();
-                    let collection = client.db(database.name).collection<AccountDTO>(database.collections.AccountsCollection);
-                    let result = await collection.findOne({email: email, password: password}, {showRecordId: false})
+                    const client = await getConnection();
+                    const collection = client.db(cfg.database.name).collection<AccountDTO>(cfg.database.collections.AccountsCollection);
+                    const result = await collection.findOne({email: email, password: password}, {showRecordId: false})
                     await client.close()
                     if (result != null) {
                         found = true;
@@ -78,16 +78,11 @@ namespace AccountService {
         return new Promise<DatabaseResponse<Omit<AccountDTO, "password"> | any>>(async resolve => {
             try {
                 let found = false;
-                let data: any;
+                let data: {} | AccountDTO = await RedisHelper.getAccountById(userId);
                 let fromCache = false;
-                let accountData: any = await RedisHelper.getAccountById(userId);
-                if (accountData.id != undefined) {
-                    fromCache = true;
-                    data = accountData
-                } else {
-                    data = await DatabaseHelper.getAccountById(userId);
-                }
-                if (data.id != undefined) found = true;
+                if (data) fromCache = true;
+                else data = await DatabaseHelper.getAccountById(userId);
+                if (data) found = true;
                 resolve({
                     status: !found ? DatabaseResponseStatus.NO_RESULTS : DatabaseResponseStatus.SUCCESS,
                     fromCache: fromCache,
@@ -102,9 +97,9 @@ namespace AccountService {
     export async function getRentDevices(userId: string): Promise<RentDeviceDTO[]> {
         return new Promise<RentDeviceDTO[]>(async resolve => {
             try {
-                let client = await getConnection();
-                let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
-                let data = await collection.find({accountId: userId}).toArray();
+                const client = await getConnection();
+                const collection = client.db(cfg.database.name).collection<RentDeviceDTO>(cfg.database.collections.RentDevicesCollection);
+                const data = await collection.find({accountId: userId}).toArray();
                 await client.close();
                 resolve(data.length != 0 ? data : [])
             } catch (e) {
@@ -117,9 +112,9 @@ namespace AccountService {
     export async function getRentDeviceById(userId: string, devId: string): Promise<RentDeviceDTO | null> {
         return new Promise<RentDeviceDTO | null>(async resolve => {
             try {
-                let client = await getConnection();
-                let collection = client.db(database.name).collection<RentDeviceDTO>(database.collections.RentDevicesCollection);
-                let data = await collection.findOne({accountId: userId, deviceId: devId});
+                const client = await getConnection();
+                const collection = client.db(cfg.database.name).collection<RentDeviceDTO>(cfg.database.collections.RentDevicesCollection);
+                const data = await collection.findOne({accountId: userId, deviceId: devId});
                 await client.close();
                 resolve(data)
             } catch (e) {
