@@ -26,7 +26,7 @@ namespace AccountService {
                     const collection = client.db(cfg.database.name).collection<AccountDTO>(cfg.database.collections.AccountsCollection);
                     const result = await collection.findOne({email: email, password: password})
                     await client.close()
-                    found = result != null;
+                    found = !!result;
                 }
                 resolve({
                     status: !found ? DatabaseResponseStatus.NO_RESULTS : DatabaseResponseStatus.SUCCESS,
@@ -58,7 +58,7 @@ namespace AccountService {
                     const collection = client.db(cfg.database.name).collection<AccountDTO>(cfg.database.collections.AccountsCollection);
                     const result = await collection.findOne({email: email, password: password}, {showRecordId: false})
                     await client.close()
-                    if (result != null) {
+                    if (result) {
                         found = true;
                         data = result;
                     }

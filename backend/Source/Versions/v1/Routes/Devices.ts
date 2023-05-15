@@ -7,19 +7,18 @@ import DeviceService from "../Services/DeviceService";
 
 
 const route: RouteController = {
-    handleGet(req, res) {
+    async handleGet(req, res) {
         const userId = RouteService.checkToken(req.header("x-access-token"));
-        if (userId == null) {
+        if (!userId) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
-        DeviceService.getDevices().then(([data, fromCache]) => {
-            res.status(200).send(
-                buildResponse<DeviceDTO[]>(APIResponseStatus.SUCCESS, "", fromCache, data).toJSON()
-            )
-        })
+        const [data, fromCache] = await DeviceService.getDevices();
+        res.status(200).send(
+            buildResponse<DeviceDTO[]>(APIResponseStatus.SUCCESS, "", fromCache, data).toJSON()
+        )
     }
 }
 

@@ -8,14 +8,14 @@ import DeviceService from "../Services/DeviceService";
 const route: RouteController = {
     async handlePut(req, res) {
         let userId = RouteService.checkToken(req.header("x-access-token"));
-        if (userId == null) {
+        if (!userId) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
         const accResp = await AccountService.GetAccountById(userId);
-        if (accResp.data.id == undefined) {
+        if (!accResp.data.id) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )

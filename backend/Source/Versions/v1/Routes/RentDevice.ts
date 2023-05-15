@@ -10,7 +10,7 @@ import rentDevice = DeviceService.rentDevice;
 const route: RouteController = {
     async handlePost(req, res) {
         const userId = RouteService.checkToken(req.header("x-access-token"));
-        if (userId == null) {
+        if (!userId) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
@@ -24,7 +24,7 @@ const route: RouteController = {
             return
         }
         const device = await DeviceService.getDevice(deviceId as string);
-        if (device[0] != null && !(await DeviceService.isDeviceRent(deviceId as string))) {
+        if (!!device[0] && !(await DeviceService.isDeviceRent(deviceId as string))) {
             if (!(await rentDevice(deviceId as string, userId))) {
                 res.status(400).send(
                     buildResponse(APIResponseStatus.ERROR, `Cannot rent device with id ${deviceId}.`).toJSON()

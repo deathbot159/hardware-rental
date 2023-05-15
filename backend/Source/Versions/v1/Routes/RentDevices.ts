@@ -8,7 +8,7 @@ import AccountService from "../Services/AccountService";
 const route: RouteController = {
     async handleGet(req, res) {
         const userId = RouteService.checkToken(req.header("x-access-token"));
-        if (userId == null) {
+        if (!userId) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )

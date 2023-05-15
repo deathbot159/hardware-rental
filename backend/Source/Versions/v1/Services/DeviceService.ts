@@ -38,12 +38,12 @@ namespace DeviceService {
             let data: DeviceDTO | null = null;
             try {
                 data = await RedisHelper.getDevice(deviceId);
-                if (data == null) {
+                if (!data) {
                     const client = await getConnection();
                     const collection = client.db(cfg.database.name).collection<DeviceDTO>(cfg.database.collections.DevicesCollection);
                     data = await collection.findOne({id: deviceId});
                     await client.close();
-                    if (data != null) await RedisHelper.addDevice(data);
+                    if (data) await RedisHelper.addDevice(data);
                 } else fromCache = true;
                 resolve([data, fromCache]);
             } catch (e) {
@@ -60,7 +60,7 @@ namespace DeviceService {
                 const collection = client.db(cfg.database.name).collection<RentDeviceDTO>(cfg.database.collections.RentDevicesCollection);
                 const data = await collection.findOne({deviceId: deviceId});
                 await client.close()
-                resolve(data != null);
+                resolve(!!data);
             } catch (e) {
                 console.error(e);
                 resolve(false);

@@ -5,8 +5,7 @@ import TokenService from "../Services/TokenService";
 
 const route: RouteController = {
     handlePost(req, res) {
-        const {token} = req.body;
-        const data = TokenService.untokenize(token);
+        const data = TokenService.untokenize(req.body.token);
         res.send(
             buildResponse(data.id == "" ? APIResponseStatus.INVALID_TOKEN : APIResponseStatus.SUCCESS)
         )

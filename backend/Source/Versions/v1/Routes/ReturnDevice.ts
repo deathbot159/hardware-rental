@@ -12,7 +12,7 @@ import returnDevice = DeviceService.returnDevice;
 const route: RouteController = {
     async handleDelete(req, res) {
         const userId = RouteService.checkToken(req.header("x-access-token"));
-        if (userId == null) {
+        if (!userId) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
@@ -27,7 +27,7 @@ const route: RouteController = {
         }
         const rentDevice = await AccountService.getRentDeviceById(userId, devId);
         const device = await DeviceService.getDevice(devId);
-        if (rentDevice == null || device[0] == null) {
+        if (!rentDevice || !device[0]) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.ERROR, "Cannot find requested device.").toJSON()
             )

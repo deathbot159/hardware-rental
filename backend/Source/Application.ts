@@ -32,7 +32,7 @@ const loadVersions = () => {
             console.log(`=> ❌ Cannot find version "${name}" in routes.json. Exiting...`);
             return false;
         }
-        let entry = fs.statSync(path.join(versionsPath, name))
+        const entry = fs.statSync(path.join(versionsPath, name))
         if (entry.isDirectory()) {
             if (!fs.readdirSync(path.join(versionsPath, name)).find(n => n.includes("index"))) {
                 console.log(`=> ❌ Cannot find index file for version "${name}".`);
