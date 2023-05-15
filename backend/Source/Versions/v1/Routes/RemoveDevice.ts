@@ -5,16 +5,16 @@ import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import AccountService from "../Services/AccountService";
 import DeviceService from "../Services/DeviceService";
 
-let route: RouteController = {
+const route: RouteController = {
     async handleDelete(req, res) {
-        let userId = RouteService.checkToken(req.header("x-access-token"));
+        const userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
-        let accResp = await AccountService.GetAccountById(userId);
+        const accResp = await AccountService.GetAccountById(userId);
         if (accResp.data.id == undefined) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
@@ -27,7 +27,7 @@ let route: RouteController = {
             )
             return
         }
-        let devId = req.params.id;
+        const devId = req.params.id;
         if (!devId) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()

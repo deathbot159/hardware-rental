@@ -7,9 +7,9 @@ import RentDeviceDTO from "../../../DTOs/RentDeviceDTO";
 import GetAccountById = AccountService.GetAccountById;
 
 
-let route: RouteController = {
+const route: RouteController = {
     async handleGet(req, res) {
-        let token = req.header("x-access-token");
+        const token = req.header("x-access-token");
 
         if (token == undefined) {
             res.status(401).send(
@@ -17,7 +17,7 @@ let route: RouteController = {
             )
             return
         }
-        let tokenData = TokenService.untokenize(token);
+        const tokenData = TokenService.untokenize(token);
         if (tokenData.id == "") {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
@@ -25,10 +25,10 @@ let route: RouteController = {
             return
         }
 
-        let accResp = (await GetAccountById(tokenData.id));
+        const accResp = (await GetAccountById(tokenData.id));
 
         if (accResp.data.id != undefined) {
-            let rentDevices = await AccountService.getRentDevices(tokenData.id);
+            const rentDevices = await AccountService.getRentDevices(tokenData.id);
             res.status(200).send(
                 buildResponse<{ name: string, avatar: string, admin: boolean, rentDevices: RentDeviceDTO[] }>
                 (APIResponseStatus.SUCCESS, "", accResp.fromCache,

@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan"
 import fs from "fs";
 import path from "path";
-import routes from "./routes.json";
+import Routes from "./Routes"
 import ApiVersion from "./Helpers/ApiVersion";
 import helmet from "helmet";
 
@@ -28,7 +28,7 @@ const loadVersions = () => {
     const versionsDir = fs.readdirSync(versionsPath);
     if (versionsDir.length == 0) return false;
     for (let name of versionsDir) {
-        if (!(name in routes)) {
+        if (!(name in Routes)) {
             console.log(`=> ❌ Cannot find version "${name}" in routes.json. Exiting...`);
             return false;
         }

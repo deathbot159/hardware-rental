@@ -3,13 +3,13 @@ import buildResponse from "../Response";
 import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import AccountService from "../Services/AccountService";
 import {DatabaseResponseStatus} from "../../../Helpers/DatabaseResponse";
-import {authTokens} from "../../../Config.json";
+import cfg from "../../../Config";
 import jwt from "jsonwebtoken";
 import RedisHelper from "../../../Helpers/RedisHelper";
 
-let route: RouteController = {
+const route: RouteController = {
     async handlePost(req, res) {
-        let {email, password}: { email: string, password: string } = req.body;
+        const {email, password}: { email: string, password: string } = req.body;
 
         if ((!email || !password)) {
             res.status(400).send(
@@ -36,14 +36,14 @@ let route: RouteController = {
                 )
                 return;
             case DatabaseResponseStatus.SUCCESS:
-                let dbResp = await AccountService.GetAccount(email, password);
+                const dbResp = await AccountService.GetAccount(email, password);
                 if (dbResp.status == DatabaseResponseStatus.NO_RESULTS || dbResp.status == DatabaseResponseStatus.DB_ERROR) {
                     res.status(500).send(
                         buildResponse(APIResponseStatus.ERROR, "Internal server error.").toJSON()
                     )
                     return;
                 }
-                let token = jwt.sign({id: dbResp.data.id}, authTokens.secret, {expiresIn: authTokens.tokenLifetime})
+                const token = jwt.sign({id: dbResp.data.id}, cfg.authTokens.secret, {expiresIn: cfg.authTokens.tokenLifetime})
                 if (await RedisHelper.setAccount(email, dbResp.data))
                     res.send(
                         buildResponse<AuthorizeResponse>(APIResponseStatus.SUCCESS, "", dbResp.fromCache, {token: token}).toJSON()

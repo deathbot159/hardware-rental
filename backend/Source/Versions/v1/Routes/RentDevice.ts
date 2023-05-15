@@ -7,23 +7,23 @@ import RedisHelper from "../../../Helpers/RedisHelper";
 import {DeviceState} from "../../../Helpers/DeviceState";
 import rentDevice = DeviceService.rentDevice;
 
-let route: RouteController = {
+const route: RouteController = {
     async handlePost(req, res) {
-        let userId = RouteService.checkToken(req.header("x-access-token"));
+        const userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
-        let deviceId = req.params.id;
+        const deviceId = req.params.id;
         if (!deviceId) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()
             )
             return
         }
-        let device = await DeviceService.getDevice(deviceId as string);
+        const device = await DeviceService.getDevice(deviceId as string);
         if (device[0] != null && !(await DeviceService.isDeviceRent(deviceId as string))) {
             if (!(await rentDevice(deviceId as string, userId))) {
                 res.status(400).send(
