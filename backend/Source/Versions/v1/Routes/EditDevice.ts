@@ -5,7 +5,7 @@ import APIResponseStatus from "../../../Helpers/APIResponseStatus";
 import AccountService from "../Services/AccountService";
 import DeviceService from "../Services/DeviceService";
 
-let route: RouteController = {
+const route: RouteController = {
     async handlePut(req, res) {
         let userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
@@ -14,7 +14,7 @@ let route: RouteController = {
             )
             return
         }
-        let accResp = await AccountService.GetAccountById(userId);
+        const accResp = await AccountService.GetAccountById(userId);
         if (accResp.data.id == undefined) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
@@ -27,21 +27,21 @@ let route: RouteController = {
             )
             return
         }
-        let devId = req.params.id;
+        const devId = req.params.id;
         if (!devId) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()
             )
             return
         }
-        let bodyKeys = Object.keys(req.body);
+        const bodyKeys = Object.keys(req.body);
         if (bodyKeys.length == 0 || bodyKeys.length > 3 || (bodyKeys.length != 0 && bodyKeys.filter(k => ["name", "company", "state"].indexOf(k) < 0).length != 0)) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.INVALID_REQUEST_BODY).toJSON()
             )
             return
         }
-        let edits: any = {}
+        const edits: any = {}
         bodyKeys.forEach(v => edits[v] = req.body[v]);
         edits["id"] = devId;
         if (!(await DeviceService.editDevice(edits))) {

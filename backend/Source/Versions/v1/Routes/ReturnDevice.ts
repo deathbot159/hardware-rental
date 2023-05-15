@@ -9,24 +9,24 @@ import {DeviceState} from "../../../Helpers/DeviceState";
 import returnDevice = DeviceService.returnDevice;
 
 
-let route: RouteController = {
+const route: RouteController = {
     async handleDelete(req, res) {
-        let userId = RouteService.checkToken(req.header("x-access-token"));
+        const userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
             )
             return
         }
-        let devId = req.params.id;
+        const devId = req.params.id;
         if (!devId) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.INVALID_REQUEST_PARAMS).toJSON()
             )
             return
         }
-        let rentDevice = await AccountService.getRentDeviceById(userId, devId);
-        let device = await DeviceService.getDevice(devId);
+        const rentDevice = await AccountService.getRentDeviceById(userId, devId);
+        const device = await DeviceService.getDevice(devId);
         if (rentDevice == null || device[0] == null) {
             res.status(400).send(
                 buildResponse(APIResponseStatus.ERROR, "Cannot find requested device.").toJSON()

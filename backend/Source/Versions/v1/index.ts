@@ -1,87 +1,69 @@
 import {Router} from "express";
 import fs from "fs";
 import path from "path";
-import routes from "../../routes.json";
+import Routes from "../../Routes"
 import ApiVersion from "../../Helpers/ApiVersion";
-import Route from "../../Helpers/Route";
+import Route, {RouteMethods} from "../../Helpers/Route";
 
-
-let version: ApiVersion = {
+const version: ApiVersion = {
     name: "v1",
     routes: [],
     expose(): Router {
-        let router = Router();
+        const router = Router();
         //#region Load routes
-        let routesFiles = fs.readdirSync(path.join(__dirname, "Routes"));
-        if (this.name in routes) {
-            let version = (routes as any)[this.name];
-            for (let route of Object.keys(version)) {
-                let routeHandlerFile = routesFiles.find(n => n.toLowerCase().slice(0, -3) == (version[route].fileName).toLowerCase());
-                if (!routeHandlerFile) {
-                    console.log(`  -> ❌ [${this.name}] Cannot find handler for route ${route}.`);
-                    continue;
-                }
-                let file = ((require(path.join(__dirname, "Routes", routeHandlerFile)).default) as Route);
-                for (let method of (version as any)[route]["methods"] as string[]) {
-                    let problem = false;
-                    let r = (version as any)[route] as Route;
-                    if (r.disabled) {
-                        console.log(`  -> ❗ [${this.name}${route}] Route is disabled.`);
-                        continue;
-                    }
-                    r.route = route;
-                    switch (method) {
-                        case "GET":
-                            if (!file.handleGet) {
-                                console.log(`  -> ❌ [${this.name}${r.route} for ${method}] Method specified but cannot find handler.`)
-                                problem = true;
-                                break;
-                            }
-                            r.methods = ["GET"];
-                            r.handleGet = file.handleGet;
-                            router.get(r.route, r.handleGet);
-                            break;
-                        case "POST":
-                            if (!file.handlePost) {
-                                console.log(`  -> ❌ [${this.name}${r.route} for ${method}] Method specified but cannot find handler.`)
-                                problem = true;
-                                break;
-                            }
-                            r.methods = ["POST"];
-                            r.handlePost = file.handlePost;
-                            router.post(r.route, r.handlePost);
-                            break;
-                        case "PUT":
-                            if (!file.handlePut) {
-                                console.log(`  -> ❌ [${this.name}${r.route} for ${method}] Method specified but cannot find handler.`)
-                                problem = true;
-                                break;
-                            }
-                            r.methods = ["PUT"];
-                            r.handlePut = file.handlePut;
-                            router.put(r.route, r.handlePut);
-                            break;
-                        case "DELETE":
-                            if (!file.handleDelete) {
-                                console.log(`  -> ❌ [${this.name}${r.route} for ${method}] Method specified but cannot find handler.`)
-                                problem = true;
-                                break;
-                            }
-                            r.methods = ["DELETE"];
-                            r.handleDelete = file.handleDelete;
-                            router.delete(r.route, r.handleDelete);
-                            break;
-                        default:
-                            console.log(`  -> ❌ [${this.name}${r.route}] Invalid route method ${method}. Skipping...`);
-                            problem = true;
-                    }
-                    if (!problem) {
-                        this.routes.push(r);
-                        console.log(`  -> ✅ [${method} ${this.name}${r.route}] Route assigned.`);
-                    }
-                }
+        const routes = fs.readdirSync(path.join(__dirname, "Routes")).map(n=>n = n.slice(0, -3));
+        if (!(this.name in Routes)) return router;
+        const routesSettings =
+            Routes[this.name as keyof typeof Routes];
+        for (const routeName of Object.keys(routesSettings)){
+            const {disabled, fileName, methods} =
+                routesSettings[routeName as keyof typeof routesSettings];
+            if(disabled){
+                console.log(`  -> ❗ [${this.name}${routeName}] Route is disabled.`);
+                continue;
             }
-            console.log(`  -> ✅ [${this.name}] Loaded ${this.routes.length} route/s.`);
+            if(methods.length === 0){
+                console.log(`  -> ❗ [${this.name}${routeName}] No methods defined.`);
+                continue;
+            }
+            const routeController =
+                routes.find(n => n === fileName);
+            if (!routeController) {
+                console.log(`  -> ❌ [${this.name}] Cannot find handler for route ${routeName}.`);
+                continue;
+            }
+            const controller =
+                {...(require(path.join(__dirname, "Routes", routeController)).default) as Route,
+                    route: routeName, disabled: disabled, methods: methods as RouteMethods[]};
+            
+            let handlers = {"GET": "handleGet", "POST": "handlePost", "PUT": "handlePut", "DELETE": "handleDelete"}
+            let problem = false
+            controller.methods.forEach(method=>{
+                if(!controller[handlers[method as keyof typeof handlers] as keyof typeof controller]){
+                    problem = true;
+                    console.log(`  -> ❌ [${this.name}${controller.route} for ${method}] Method specified but cannot find handler.`)
+                    return;
+                }
+                const {route, handleGet, handlePost, handlePut, handleDelete} = controller;
+                switch(method){
+                    case "GET":
+                        router.get(route, handleGet!)
+                        break;
+                    case "POST":
+                        router.post(route, handlePost!)
+                        break;
+                    case "PUT":
+                        router.put(route, handlePut!)
+                        break;
+                    case "DELETE":
+                        router.delete(route, handleDelete!)
+                        break;
+                }
+            })
+            if (!problem) {
+                this.routes.push(controller);
+                console.log(`  -> ✅ [${methods.join(" ,")} ${this.name}${controller.route}] Route assigned.`);
+            }
         }
         //#endregion
         //#region Middlewares

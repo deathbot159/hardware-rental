@@ -6,9 +6,9 @@ import DeviceDTO from "../../../DTOs/DeviceDTO";
 import DeviceService from "../Services/DeviceService";
 
 
-let route: RouteController = {
+const route: RouteController = {
     handleGet(req, res) {
-        let userId = RouteService.checkToken(req.header("x-access-token"));
+        const userId = RouteService.checkToken(req.header("x-access-token"));
         if (userId == null) {
             res.status(401).send(
                 buildResponse(APIResponseStatus.INVALID_TOKEN).toJSON()
